@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css" media=screen>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
+        <style type="text/css">
+            canvas { border: 1px solid #f00; }
+        </style>
+    </head>
+    <body>
+        <input id="t1" type="button" value="t1"/>
+        <input id="t2" type="button" value="t2"/>
+        <div id="treemap"></div>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#treemap").treemap();
+		});
+                $("#t1").click(function(){
+                    $("#treemap").treemap("option","dimensions",[300,200]);
+                });
+                $("#t2").click(function(){
+                    $("#treemap").treemap("destroy");
+                });
+                $("#treemap").treemap({added:function(e,ui){alert("added");}});
+                $("#treemap").treemap({resize:function(e,ui){alert("resize");}});
+	</script>
+    </body>
+</html>
+
