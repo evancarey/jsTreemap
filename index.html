@@ -10,21 +10,27 @@
         </style>
     </head>
     <body>
-        <input id="t1" type="button" value="t1"/>
-        <input id="t2" type="button" value="t2"/>
+        <input id="t2" type="button" value="300x200"/>
+        <input id="t3" type="button" value="600x400"/>
+        <input id="t4" type="button" value="destroy"/>
         <div id="treemap"></div>
 	<script type="text/javascript">
+                var init = function(){
+                    $("#treemap").treemap();
+                    $("#t2").click(function(){
+                        $("#treemap").treemap("option","dimensions",[300,200]);
+                    });
+                    $("#t3").click(function(){
+                        $("#treemap").treemap("option","dimensions",[600,400]);
+                    });
+                    $("#t4").click(function(){
+                        $("#treemap").treemap("destroy");
+                    });
+                    $("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
+                };
 		$(document).ready(function(){
-			$("#treemap").treemap();
+                    init();
 		});
-                $("#t1").click(function(){
-                    $("#treemap").treemap("option","dimensions",[300,200]);
-                });
-                $("#t2").click(function(){
-                    $("#treemap").treemap("destroy");
-                });
-                $("#treemap").treemap({added:function(e,ui){alert("added");}});
-                $("#treemap").treemap({resize:function(e,ui){alert("resize");}});
 	</script>
     </body>
 </html>
