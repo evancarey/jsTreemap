@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Evan Carey,
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Evan Carey - initial API and implementation and/or initial documentation
+ *******************************************************************************/ 
+
 (function( $ ) {
     $.widget( "ui.treemap", {
     // These options will be used as defaults
@@ -85,10 +96,175 @@
     // Set up the widget
     _create: function() {
         this._refresh();
+                // start bogus test
+                var width = 600;
+                var height = 400;
+                var rect = [0,0,width,height];
+                var nVals = [
+			0.25,
+			0.25,
+			0.16666666666666666,
+			0.125,
+			0.083333333333333329,
+			0.083333333333333329,
+			0.041666666666666664
+			];
+                var rVals = [];
+                for (var i = 0; i < nVals.length; i++)
+                {
+                    rVals[i] = nVals[i] * (width*height);
+                }
+		var t0 = new Date();
+                var geometry = this._squarify(rect,rVals);
+		var t1 = new Date();
+                // end bogus test
+        
         $(window).resize(function(){  
         });  
     },
     _init: function() {
+    },
+    _squarify: function(rect,vals) {
+        //
+        // sumArray is copied from: 
+        // http://stackoverflow.com/questions/3762589/fastest-javascript-summation
+        // 
+        var sumArray = function() {
+            // Use one adding function rather than create a new one each
+            // time sumArray is called.
+            function add(a,b) {
+                return a + b;
+            }
+            return function(arr) {
+                return arr.reduce(add);
+            };
+        }();
+        //
+        // Non-recursive version of algorithm published in:
+        // "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
+        // http://www.win.tue.nl/~vanwijk/stm.pdf
+        //
+        // Includes tips and tricks from:
+        // http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
+        //
+        var Subrectangle = function(rect) {
+            this.setX = function(x) {
+                rect[2] -= x - rect[0];
+                rect[0] = x;
+            }
+            this.setY = function(y) {
+                rect[3] -= y - rect[1];
+                rect[1] = y;
+            }
+            this.getX = function() {
+                return rect[0];
+            }
+            this.getY = function() {
+                return rect[1];
+            }
+            this.getW = function() {
+                return rect[2];
+            }
+            this.getH = function() {
+                return rect[3];
+            }
+            this.getWidth = function() {
+                return Math.min(rect[2],rect[3]);
+            }
+        };
+        //
+        // The function worst() gives the highest aspect ratio of a list 
+        // of rectangles, given the length of the side along which they are to
+        // be laid out.
+        // Let a list of areas R be given and let s be their total sum. Then the function worst is
+        // defined by:
+        // worst(R,w) = max(max(w^2r=s^2; s^2=(w^2r)))
+        //              for all r in R 
+        // Since one term is increasing in r and the other is decreasing, this is equal to
+        //              max(w^2r+=(s^2); s^2=(w^2r-))
+        // where r+ and r- are the maximum and minimum of R. 
+        // Hence, the current maximum and minimum of the row that is being laid out.
+        // 
+        var worst = function(r,w) {
+            var rMax = Math.max.apply(null,r);
+            var rMin = Math.min.apply(null,r);
+            var s = sumArray(r);
+            var sSqr = s*s;
+            var wSqr = w*w;
+            return Math.max((wSqr*rMax)/sSqr,sSqr/(wSqr*rMin));
+        };
+
+        // Take row of values and calculate the set of rectangles 
+        // that will fit in the current subrectangle.
+        var layoutrow = function(row) {
+            var x = subrect.getX();
+            var y = subrect.getY();
+            var maxX = x + subrect.getW();
+            var maxY = y + subrect.getH();
+            if (subrect.getW() < subrect.getH()) {
+                var rowHeight = Math.ceil(sumArray(row)/subrect.getW());
+                if (y+rowHeight >= maxY) { rowHeight = maxY-y; }
+                for (var i = 0; i < row.length; i++) {
+                    var w = Math.ceil(row[i]/rowHeight);
+                    if (x+w > maxX || i+1 == row.length) { w = maxX-x; }
+                    layout.push([x,y,w,rowHeight]);
+                    x = (x+w);
+                }
+                subrect.setY(y+rowHeight);
+            } else {
+                var rowHeight = Math.ceil(sumArray(row)/subrect.getH());
+                if (x+rowHeight >= maxX) { rowHeight = maxX-x; }
+                for (var i = 0; i < row.length; i++) {
+                    var w = Math.ceil(row[i]/rowHeight);
+                    if (y+w > maxY || i+1 == row.length) { w = maxY-y; }
+                    layout.push([x,y,rowHeight,w]);
+                    y = (y+w);
+                }
+                subrect.setX(x+rowHeight);
+            }
+        };
+
+        // Pull values from input array until the aspect ratio of rectangles in row
+        // under construction degrades.
+        var buildRow = function(children) {
+            var row = [];
+            row.push(children.shift()); // descending input
+            //row.push(children.pop()); // ascending input
+            if (children.length == 0) {
+                return row;
+            }
+            var newRow = row.slice();
+            var w = subrect.getWidth();
+            do {
+                newRow.push(children[0]); // descending input
+                //newRow.push(children[children.length-1]); // ascending input
+                if (worst(row,w) > worst(newRow,w)){
+                    row = newRow.slice();
+                    children.shift(); // descending input
+                    //children.pop(); // ascending input
+                }
+                else {
+                    break;
+                }
+            } while (children.length > 0);
+            return row;
+        };
+
+        // Non recursive version of Bruls, Huizing and van Wijk
+        // squarify layout algorithim.
+        // While values exist in input array, make a row with good aspect
+        // ratios for its values then caclulate the row's geometry, repeat.
+        var nrSquarify = function(children) {
+            do {
+                layoutrow(buildRow(children));
+            } while (children.length > 0);
+        };
+    
+        var row = [];
+        var layout = [];
+        var subrect = new Subrectangle(rect.slice());
+        nrSquarify(vals.slice());
+        return layout;
     },
     // Use the _setOption method to respond to changes to options
     _setOption: function(option, value) {  
@@ -98,11 +274,16 @@
                 this.options.dimensions = value;
                 this._refresh();
                 break;
+            case "colorGradient":
+                this.options.colorGradient = value;
+                this._refresh();
+                break;
         }  
     },
     _refresh: function() {
         this._refreshCanvas();
         this._refreshColorGradient();
+        this._refreshLayout(this._squarify);
         this._trigger("refresh", null, this.element);
     },
     _refreshCanvas: function() {
@@ -128,9 +309,41 @@
         ctx.fillRect(0,0,this.options.colorGradient.resolution,1);
         this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorGradient.resolution,1);
     },
-    _refreshLayout: function() {
+    _refreshLayout: function(layoutMethod) {
         var t0 = new Date();
+        var nodeCnt = 0;
+        function _processNodes(rect,children,nodes,area,layoutMethod) {
+            console.log("blah");
+            var a = [];
+            for (var i = 0; i < children.length; i++) {
+                a[i]=nodes[children[i]].size*area;
+            }
+            var b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
+            nodeCnt += b.length;
+            for (var i = 0; i < children.length; i++) {
+                nodes[children[i]].geometry = b[i];//.slice();
+            }
+            for (var i = 0; i < children.length; i++) {
+                if (nodes[children[i]].hasOwnProperty('children')) {
+                    rect = nodes[children[i]].geometry;
+                    if ((children[i] != 0) && (rect[3]>0)) {
+                        rect = [rect[0],rect[1],rect[2],rect[3]];
+                    }
+                    area = rect[2]*rect[3];
+                    _processNodes(rect,nodes[children[i]].children,nodes,area,layoutMethod);
+                }
+            }
+        };
+        var area = this.options.dimensions[0] * this.options.dimensions[1];
+        var rect = [0,0,this.options.dimensions[0],this.options.dimensions[1]];
+        _processNodes(rect,[0],this.options.nodeList,area,layoutMethod);
         var t1 = new Date();
+        console.log("node count = " + nodeCnt + "; msec = " + (t1-t0));
+    },
+    _getRgbColor: function(val) {
+        var map = this.options.colorGradientMap.data;
+        var i = Math.floor(val*(map.length/4))*4;
+        return [map[i],map[i+1],map[i+2]];
     },
     // Use the destroy method to clean up any modifications your widget has made to the DOM
     destroy: function() {

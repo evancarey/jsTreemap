@@ -10,13 +10,17 @@
         </style>
     </head>
     <body>
+        <input id="t1" type="button" value="on"/>
         <input id="t2" type="button" value="300x200"/>
         <input id="t3" type="button" value="600x400"/>
         <input id="t4" type="button" value="destroy"/>
         <div id="treemap"></div>
 	<script type="text/javascript">
                 var init = function(){
-                    $("#treemap").treemap();
+                    $("#t1").click(function(){
+                        $("#treemap").treemap();
+                        //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
+                    });
                     $("#t2").click(function(){
                         $("#treemap").treemap("option","dimensions",[300,200]);
                     });
@@ -26,7 +30,6 @@
                     $("#t4").click(function(){
                         $("#treemap").treemap("destroy");
                     });
-                    $("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
                 };
 		$(document).ready(function(){
                     init();
