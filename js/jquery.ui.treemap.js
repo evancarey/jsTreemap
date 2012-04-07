@@ -12,20 +12,24 @@
 (function( $ ) {
     $.widget( "ui.treemap", {
     // These options will be used as defaults
-    options: {  
+    options: {
+        // in future get dimensions from containing element maybe?
         dimensions: [600,400],
+        // 
         colorGradient: { 
             resolution: 1024,
             colorStops : [
-                {"val":0,  "color":"#033"},
-                {"val":.25,"color":"#066"},
-                {"val":.5, "color":"#666"},
-                {"val":.75,"color":"#660"},
-                {"val":1,  "color":"#330"}
+                {"val":0,  "color":"#f03"},
+                {"val":.25,"color":"#f8a"},
+                {"val":.5, "color":"#fff"},
+                {"val":.75,"color":"#a8f"},
+                {"val":1,  "color":"#30f"}
             ],
         },
         groupHeaderHeight: 0,
         nodeBorderWidth: 0,
+        // For now node list is hard coded here.  
+        // In future node list will be obtained from ajax call.
         nodeList: {
             0:{"size":1.0, "color":.74, "label":"root", "children":[1,2,3,4,5,6,7]},
             1:{"size":.25, "color":.39, "label":"blah1", "parent":0, "children":[11,12,13,14,15,16,17]},
@@ -96,29 +100,6 @@
     // Set up the widget
     _create: function() {
         this._refresh();
-                // start bogus test
-                var width = 600;
-                var height = 400;
-                var rect = [0,0,width,height];
-                var nVals = [
-			0.25,
-			0.25,
-			0.16666666666666666,
-			0.125,
-			0.083333333333333329,
-			0.083333333333333329,
-			0.041666666666666664
-			];
-                var rVals = [];
-                for (var i = 0; i < nVals.length; i++)
-                {
-                    rVals[i] = nVals[i] * (width*height);
-                }
-		var t0 = new Date();
-                var geometry = this._squarify(rect,rVals);
-		var t1 = new Date();
-                // end bogus test
-        
         $(window).resize(function(){  
         });  
     },
@@ -284,7 +265,168 @@
         this._refreshCanvas();
         this._refreshColorGradient();
         this._refreshLayout(this._squarify);
+        this._render();
         this._trigger("refresh", null, this.element);
+    },
+    _render: function() {
+        var t0 = new Date();
+        //
+        // String functions from: http://sajjadhossain.com/2008/10/31/javascript-string-trimming-and-padding/
+        //
+        //trimming space from both side of the string
+        String.prototype.trim = function() {
+            return this.replace(/^\s+|\s+$/g,"");
+        }
+         
+        //trimming space from left side of the string
+        String.prototype.ltrim = function() {
+            return this.replace(/^\s+/,"");
+        }
+         
+        //trimming space from right side of the string
+        String.prototype.rtrim = function() {
+            return this.replace(/\s+$/,"");
+        }
+        
+        //pads left
+        String.prototype.lpad = function(padString, length) {
+            var str = this;
+            while (str.length < length)
+                str = padString + str;
+            return str;
+        }
+        
+        //pads right
+        String.prototype.rpad = function(padString, length) {
+            var str = this;
+            while (str.length < length)
+                str = str + padString;
+            return str;
+        }
+        
+        //
+        // Color shifting algo from: http://stackoverflow.com/questions/1507931/generate-lighter-darker-color-in-css-using-javascript
+        // 
+        // Modified to use the lpad function defined above.
+        //
+        // Exmaple Usage
+        // var darker = darkerColor('rgba(80, 75, 52, .5)', .2);
+        // var lighter = lighterColor('rgba(80, 75, 52, .5)', .2);
+        
+        //var pad = function(num, totalChars) {
+        //    var pad = '0';
+        //    num = num + '';
+        //    while (num.length < totalChars) {
+        //        num = pad + num;
+        //    }
+        //    return num;
+        //};
+        
+        // Ratio is between 0 and 1
+        var changeColor = function(color, ratio, darker) {
+            // Trim trailing/leading whitespace
+            color = color.replace(/^\s*|\s*$/, '');
+        
+            // Expand three-digit hex
+            color = color.replace(
+                /^#?([a-f0-9])([a-f0-9])([a-f0-9])$/i,
+                '#$1$1$2$2$3$3'
+            );
+        
+            // Calculate ratio
+            var difference = Math.round(ratio * 256) * (darker ? -1 : 1),
+                // Determine if input is RGB(A)
+                rgb = color.match(new RegExp('^rgba?\\(\\s*' +
+                    '(\\d|[1-9]\\d|1\\d{2}|2[0-4][0-9]|25[0-5])' +
+                    '\\s*,\\s*' +
+                    '(\\d|[1-9]\\d|1\\d{2}|2[0-4][0-9]|25[0-5])' +
+                    '\\s*,\\s*' +
+                    '(\\d|[1-9]\\d|1\\d{2}|2[0-4][0-9]|25[0-5])' +
+                    '(?:\\s*,\\s*' +
+                    '(0|1|0?\\.\\d+))?' +
+                    '\\s*\\)$'
+                , 'i')),
+                alpha = !!rgb && rgb[4] != null ? rgb[4] : null,
+        
+                // Convert hex to decimal
+                decimal = !!rgb? [rgb[1], rgb[2], rgb[3]] : color.replace(
+                    /^#?([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])/i,
+                    function() {
+                        return parseInt(arguments[1], 16) + ',' +
+                            parseInt(arguments[2], 16) + ',' +
+                            parseInt(arguments[3], 16);
+                    }
+                ).split(/,/),
+                returnValue;
+        
+            // Return RGB(A)
+            return !!rgb ?
+                'rgb' + (alpha !== null ? 'a' : '') + '(' +
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[0], 10) + difference, darker ? 0 : 255
+                    ) + ', ' +
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[1], 10) + difference, darker ? 0 : 255
+                    ) + ', ' +
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[2], 10) + difference, darker ? 0 : 255
+                    ) +
+                    (alpha !== null ? ', ' + alpha : '') +
+                    ')' :
+                // Return hex
+                [
+                    '#',
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[0], 10) + difference, darker ? 0 : 255
+                    ).toString(16).lpad("0",2),
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[1], 10) + difference, darker ? 0 : 255
+                    ).toString(16).lpad("0",2),
+                    Math[darker ? 'max' : 'min'](
+                        parseInt(decimal[2], 10) + difference, darker ? 0 : 255
+                    ).toString(16).lpad("0",2)
+                ].join('');
+        };
+        
+        var lighterColor = function(color, ratio) {
+            return changeColor(color, ratio, false);
+        };
+        
+        var darkerColor = function(color, ratio) {
+            return changeColor(color, ratio, true);
+        };
+        
+        var rgb2hex = function(rgb) {
+            var str = "#"+((rgb[2]|(rgb[1]<<8)|(rgb[0]<<16)).toString(16).lpad("0",6));
+            return str;
+        };
+        
+        var avgRgb = function(rgb) {
+            return Math.floor(sumArray(rgb)/3);
+        };
+        var linearGradient = function(ctx,rect,rgb,ratio) {
+            var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0]+rect[2],rect[1]+rect[3]);
+            gradient.addColorStop(0,rgb2hex(rgb));
+            gradient.addColorStop(1,darkerColor(rgb2hex(rgb),ratio));
+            return gradient;
+        };
+        var canvas = this.element.find("canvas")[0];
+        var ctx = canvas.getContext("2d");
+        var nodeCnt = 0;
+        for (var i in this.options.nodeList) {
+            var rect = this.options.nodeList[i].geometry;
+            var rgb = this._getRgbColor(this.options.nodeList[i].color);
+            ctx.save();
+            ctx.fillStyle = linearGradient(ctx,rect,rgb,.35);
+            ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
+            ctx.beginPath();
+            ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+            ctx.clip();
+            ctx.restore();
+            nodeCnt++;
+        }
+        var t1 = new Date();
+        console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
     },
     _refreshCanvas: function() {
         var canvas = this.element.find("canvas");
@@ -313,7 +455,6 @@
         var t0 = new Date();
         var nodeCnt = 0;
         function _processNodes(rect,children,nodes,area,layoutMethod) {
-            console.log("blah");
             var a = [];
             for (var i = 0; i < children.length; i++) {
                 a[i]=nodes[children[i]].size*area;
@@ -338,7 +479,7 @@
         var rect = [0,0,this.options.dimensions[0],this.options.dimensions[1]];
         _processNodes(rect,[0],this.options.nodeList,area,layoutMethod);
         var t1 = new Date();
-        console.log("node count = " + nodeCnt + "; msec = " + (t1-t0));
+        console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
     },
     _getRgbColor: function(val) {
         var map = this.options.colorGradientMap.data;
