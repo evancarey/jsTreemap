@@ -15,11 +15,13 @@
         <input id="t3" type="button" value="600x400"/>
         <input id="t4" type="button" value="destroy"/>
         <div id="treemap"></div>
-        <div id="blah"></div>
+        <div id="blah"><span><p>click the on button to create treemap</p></span></div>
+        <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
 	<script type="text/javascript">
                 var init = function(){
                     $("#t1").click(function(){
                         $("#treemap").treemap();
+                        $("#blah").html("<span><p>0,0</p></span>");
                         //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
                         $("#treemap").bind('treemapmousemove',function(e,data){
                             var nodes = data.nodes;
@@ -34,6 +36,7 @@
                     });
                     $("#t4").click(function(){
                         $("#treemap").treemap("destroy");
+                        $("#blah").html("<span><p>click the on button to create treemap</p></span>");
                     });
                 };
 		$(document).ready(function(){
