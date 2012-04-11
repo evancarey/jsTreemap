@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Evan Carey - initial API and implementation and/or initial documentation
+ *    Evan Carey - initial API and implementation and initial documentation
  *******************************************************************************/ 
 
 (function( $ ) {
@@ -15,7 +15,7 @@
     options: {
         // in future get dimensions from containing element maybe?
         dimensions: [600,400],
-        // 
+        // For initial dev, color gradient is hard coded here.  
         colorGradient: { 
             resolution: 1024,
             colorStops : [
@@ -28,8 +28,8 @@
         },
         groupHeaderHeight: 0,
         nodeBorderWidth: 0,
-        // For now node list is hard coded here.  
-        // In future node list will be obtained from ajax call.
+        // For initial dev, node list is hard coded here.  
+        // In future node list will be obtained from ajax call and/or setOption call.
         nodeList: {
             0:{"size":1.0, "color":.74, "label":"root", "children":[1,2,3,4,5,6,7]},
             1:{"size":.25, "color":.39, "label":"blah1", "parent":0, "children":[11,12,13,14,15,16,17]},
@@ -97,14 +97,17 @@
             77:{"size":.041666667, "color":.52, "label":"blah77", "parent":7},
         }
     },  
+
     // Set up the widget
     _create: function() {
-        this._refresh();
         $(window).resize(function(){  
         });  
     },
+
     _init: function() {
+        this._refresh();
     },
+
     _squarify: function(rect,vals) {
         //
         // sumArray is copied from: 
@@ -247,6 +250,7 @@
         nrSquarify(vals.slice());
         return layout;
     },
+
     // Use the _setOption method to respond to changes to options
     _setOption: function(option, value) {  
         $.Widget.prototype._setOption.apply( this, arguments );  
@@ -255,12 +259,17 @@
                 this.options.dimensions = value;
                 this._refresh();
                 break;
-            case "colorGradient":
+            case "colorGradient": // TODO: don't need to completely rebuild here. just update color gradient and re-render.
                 this.options.colorGradient = value;
+                this._refresh();
+                break;
+            case "nodeList":
+                this.options.nodeList = value;
                 this._refresh();
                 break;
         }  
     },
+
     _refresh: function() {
         this._refreshCanvas();
         this._refreshColorGradient();
@@ -268,6 +277,7 @@
         this._render();
         this._trigger("refresh", null, this.element);
     },
+
     _render: function() {
         var t0 = new Date();
         //
@@ -413,6 +423,7 @@
         var canvas = this.element.find("canvas")[0];
         var ctx = canvas.getContext("2d");
         var nodeCnt = 0;
+        this._clearScanLines();
         for (var i in this.options.nodeList) {
             var rect = this.options.nodeList[i].geometry;
             var rgb = this._getRgbColor(this.options.nodeList[i].color);
@@ -422,12 +433,16 @@
             ctx.beginPath();
             ctx.rect(rect[0],rect[1],rect[2],rect[3]);
             ctx.clip();
+            for (var j = 0; j < rect[3]; j++) {
+                this._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),i);
+            }
             ctx.restore();
             nodeCnt++;
         }
         var t1 = new Date();
         console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
     },
+
     _refreshCanvas: function() {
         var canvas = this.element.find("canvas");
         if (canvas)
@@ -435,8 +450,27 @@
         canvas = document.createElement("canvas");
         canvas.setAttribute("width",this.options.dimensions[0]);
         canvas.setAttribute("height",this.options.dimensions[1]);
-        this.element.append(canvas);
+        var blah = this;
+        this.element.append(canvas).mousemove(function(e){
+            //console.log(e.pageX+","+e.pageY);
+            //console.log(blah._coordsToId(e.pageX,e.pageY));
+            var offset = blah.element.offset();
+            var width = blah.options.dimensions[0];
+            var height = blah.options.dimensions[1];
+            if (e.pageX < offset.left+width && e.pageY < (offset.top+height))
+            {
+                var ids = blah._coordsToId(e.pageX-offset.left,e.pageY-offset.top);
+                var nodes = [];
+                for ( var i = 0; i < ids.length; i++ )
+                {
+                    nodes.push(blah.options.nodeList[ids[i]]);
+                }
+                var data = {"nodes": nodes};
+                blah._trigger('mousemove',e,data);
+            }
+        });
     },
+
     _refreshColorGradient: function() {
         var canvas = document.createElement("canvas");
         canvas.setAttribute("width",this.options.colorGradient.resolution);
@@ -451,6 +485,7 @@
         ctx.fillRect(0,0,this.options.colorGradient.resolution,1);
         this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorGradient.resolution,1);
     },
+
     _refreshLayout: function(layoutMethod) {
         var t0 = new Date();
         var nodeCnt = 0;
@@ -481,11 +516,46 @@
         var t1 = new Date();
         console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
     },
+
     _getRgbColor: function(val) {
         var map = this.options.colorGradientMap.data;
         var i = Math.floor(val*(map.length/4))*4;
         return [map[i],map[i+1],map[i+2]];
     },
+
+    _clearScanLines: function() {
+        delete(this.scanLines);
+    },
+
+    _addRunlength: function(x1,x2,y,id) {
+        if (!this.scanLines) {
+            this.scanLines = [];
+        }
+        y_str = parseInt(y);
+        if(!this.scanLines[y_str]){
+            this.scanLines[y_str] = [];
+        }
+        this.scanLines[y_str].push(new Array(x1,x2,id));
+        //this.scanLines[y_str].unshift(new Array(x1,x2,id));
+    },
+
+    _coordsToId: function(x, y) {
+        var runlengths = this.scanLines[y];
+        var ids = new Array();
+        if (runlengths) {
+            for (var i = runlengths.length-1; i >= 0; i--) {
+                var runlength = runlengths[i];
+                var xstart = runlength[0];
+                var xend = runlength[1];
+                var id = runlength[2];
+                if (xstart<=x && xend>x) {
+                    ids.push(id);
+                }
+            }
+        }
+        return ids;
+    },
+
     // Use the destroy method to clean up any modifications your widget has made to the DOM
     destroy: function() {
         this.element.find("canvas").remove();  

@@ -11,18 +11,23 @@
     </head>
     <body>
         <input id="t1" type="button" value="on"/>
-        <input id="t2" type="button" value="300x200"/>
+        <input id="t2" type="button" value="800x200"/>
         <input id="t3" type="button" value="600x400"/>
         <input id="t4" type="button" value="destroy"/>
         <div id="treemap"></div>
+        <div id="blah"></div>
 	<script type="text/javascript">
                 var init = function(){
                     $("#t1").click(function(){
                         $("#treemap").treemap();
                         //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
+                        $("#treemap").bind('treemapmousemove',function(e,data){
+                            var nodes = data.nodes;
+                            $("#blah").html("<span><p>" + e.pageX + ", " + e.pageY + "; nodes[0].label = " + nodes[0].label + "</p></span>");
+                        });
                     });
                     $("#t2").click(function(){
-                        $("#treemap").treemap("option","dimensions",[300,200]);
+                        $("#treemap").treemap("option","dimensions",[800,200]);
                     });
                     $("#t3").click(function(){
                         $("#treemap").treemap("option","dimensions",[600,400]);
