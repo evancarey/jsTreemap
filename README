@@ -1,1 +1,3 @@
 A Javascript treemap implementation using jQuery widget factory.
+Uses HTML5 canvas to render treemap nodes.
+Lightly tested with Firefox on Mac and Linux(Ubuntu).
