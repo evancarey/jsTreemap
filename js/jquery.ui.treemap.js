@@ -445,21 +445,22 @@
 
     _refreshCanvas: function() {
         var canvas = this.element.find("canvas");
-        if (canvas)
+        if (canvas){
             canvas.remove();
+        }
         canvas = document.createElement("canvas");
         canvas.setAttribute("width",this.options.dimensions[0]);
         canvas.setAttribute("height",this.options.dimensions[1]);
         var blah = this;
         this.element.append(canvas).mousemove(function(e){
-            //console.log(e.pageX+","+e.pageY);
-            //console.log(blah._coordsToId(e.pageX,e.pageY));
             var offset = blah.element.offset();
+            var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
+            var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
             var width = blah.options.dimensions[0];
             var height = blah.options.dimensions[1];
-            if (e.pageX < offset.left+width && e.pageY < (offset.top+height))
+            if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
             {
-                var ids = blah._coordsToId(e.pageX-offset.left,e.pageY-offset.top);
+                var ids = blah._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
                 var nodes = [];
                 for ( var i = 0; i < ids.length; i++ )
                 {
