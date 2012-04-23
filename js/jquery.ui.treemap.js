@@ -465,7 +465,7 @@
                 {
                     nodes.push(blah.options.nodeList[ids[i]]);
                 }
-                var data = {"nodes": nodes};
+                var data = {"nodes": nodes, "ids": ids};
                 blah._trigger('mousemove',e,data);
             }
         });
@@ -524,7 +524,7 @@
     },
 
     _clearScanLines: function() {
-        delete(this.scanLines);
+        this.scanLines = [];
     },
 
     _addRunlength: function(x1,x2,y,id) {

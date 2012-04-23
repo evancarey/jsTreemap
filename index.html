@@ -7,6 +7,7 @@
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
+            #highlighter { border: 1px solid #fff; position: absolute; display: none; }
         </style>
     </head>
     <body>
@@ -17,32 +18,49 @@
         <div id="treemap"></div>
         <div id="blah"><span><p>click the on button to create treemap</p></span></div>
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
-	<script type="text/javascript">
-                var init = function(){
-                    $("#t1").click(function(){
-                        $("#treemap").treemap();
-                        $("#blah").html("<span><p>0,0</p></span>");
-                        //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
-                        $("#treemap").bind('treemapmousemove',function(e,data){
-                            var nodes = data.nodes;
-                            $("#blah").html("<span><p>" + e.pageX + ", " + e.pageY + "; nodes[0].label = " + nodes[0].label + "</p></span>");
-                        });
-                    });
-                    $("#t2").click(function(){
-                        $("#treemap").treemap("option","dimensions",[800,200]);
-                    });
-                    $("#t3").click(function(){
-                        $("#treemap").treemap("option","dimensions",[600,400]);
-                    });
-                    $("#t4").click(function(){
-                        $("#treemap").treemap("destroy");
-                        $("#blah").html("<span><p>click the on button to create treemap</p></span>");
-                    });
-                };
-		$(document).ready(function(){
-                    init();
-		});
-	</script>
+        <div id="highlighter"></div>
+	    <script type="text/javascript">
+            var currentNode;
+            var mousemoveHandler = function(e,data) {
+                var nodes = data.nodes;
+                var ids = data.ids;
+                $("#blah").html("<span><p>" + e.pageX + ", " + e.pageY + "; ids[0] = " + ids[0] + "; nodes[0].label = " + nodes[0].label + "</p></span>");
+                var offset = $("#treemap").offset();
+                $("#highlighter").css("display","inline");
+                $("#highlighter").css("left",nodes[0].geometry[0]+offset.left);
+                $("#highlighter").css("top",nodes[0].geometry[1]+offset.top);
+                $("#highlighter").css("width",nodes[0].geometry[2]);
+                $("#highlighter").css("height",nodes[0].geometry[3]);
+                if (currentNode == undefined || currentNode != ids[0]){
+                    //console.log("new id " + ids[0]);
+                    currentNode = ids[0];
+                }
+            };
+            var init = function(){
+                $("#t1").click(function(){
+                    $("#treemap").treemap();
+                    $("#blah").html("<span><p>0,0</p></span>");
+                    //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
+                    $("#treemap").bind('treemapmousemove',mousemoveHandler);
+                });
+                $("#t2").click(function(){
+                    $("#treemap").treemap("option","dimensions",[800,200]);
+                    $("#highlighter").css("display","none");
+                });
+                $("#t3").click(function(){
+                    $("#treemap").treemap("option","dimensions",[600,400]);
+                    $("#highlighter").css("display","none");
+                });
+                $("#t4").click(function(){
+                    $("#treemap").treemap("destroy");
+                    $("#blah").html("<span><p>click the on button to create treemap</p></span>");
+                    $("#highlighter").css("display","none");
+                });
+            };
+            $(document).ready(function(){
+                        init();
+            });
+        </script>
     </body>
 </html>
 
