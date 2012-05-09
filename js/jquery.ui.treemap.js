@@ -525,7 +525,9 @@
     },
 
     _clearScanLines: function() {
-        delete(this.scanLines);
+        if (this.scanLines) {
+            this.scanLines.length = 0;
+        }
     },
 
     _addRunlength: function(x1,x2,y,id) {

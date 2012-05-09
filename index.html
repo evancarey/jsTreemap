@@ -47,6 +47,7 @@
                     $("#nodeHighlighter").css("display","none");
                 });
                 $("#t4").click(function(){
+                    $("#treemap").unbind();
                     $("#treemap").treemap("destroy");
                     $("#blah").html("<span><p>click the on button to create treemap</p></span>");
                     $("#nodeHighlighter").css("display","none");
