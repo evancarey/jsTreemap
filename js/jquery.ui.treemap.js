@@ -26,10 +26,11 @@
                 {"val":1,  "color":"#30f"}
             ],
         },
-        groupHeaderHeight: 0,
+        groupHeaderHeight: 12,
         nodeBorderWidth: 0,
         // For initial dev, node list is hard coded here.  
         // In future node list will be obtained from ajax call and/or setOption call.
+        // nodeList format subject to change after working through rendering.
         nodeList: {
             0:{"size":1.0, "color":.74, "label":"root", "children":[1,2,3,4,5,6,7]},
             1:{"size":.25, "color":.39, "label":"blah1", "parent":0, "children":[11,12,13,14,15,16,17]},
@@ -414,6 +415,12 @@
         var avgRgb = function(rgb) {
             return Math.floor(sumArray(rgb)/3);
         };
+        var headerGradient = function(ctx,rect,rgb,headerHeight) {
+            var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerHeight);
+            gradient.addColorStop(0,"#ffffff");
+            gradient.addColorStop(1,rgb2hex(rgb));
+            return gradient;
+        }
         var linearGradient = function(ctx,rect,rgb,ratio) {
             var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0]+rect[2],rect[1]+rect[3]);
             gradient.addColorStop(0,rgb2hex(rgb));
@@ -427,16 +434,36 @@
         for (var i in this.options.nodeList) {
             var rect = this.options.nodeList[i].geometry;
             var rgb = this._getRgbColor(this.options.nodeList[i].color);
+            this.options.nodeList[i].computedColor = rgb;
             ctx.save();
-            ctx.fillStyle = linearGradient(ctx,rect,rgb,.35);
+            if ( this.options.nodeList[i].hasOwnProperty('children')) {
+                // group node
+                ctx.fillStyle = headerGradient(ctx,rect,[64,64,64],this.options.groupHeaderHeight);
+            } else {
+                ctx.fillStyle = linearGradient(ctx,rect,rgb,.35);
+            }
             ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
-            ctx.beginPath();
-            ctx.rect(rect[0],rect[1],rect[2],rect[3]);
-            ctx.clip();
+            if ( this.options.nodeList[i].hasOwnProperty('children')) {
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(rect[0],rect[1]);
+                ctx.lineTo(rect[0],rect[1]+this.options.groupHeaderHeight);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(rect[0]+rect[2],rect[1]);
+                ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeaderHeight);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            //ctx.beginPath();
+            //ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+            //ctx.clip();
+            ctx.restore();
             for (var j = 0; j < rect[3]; j++) {
                 this._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),i);
             }
-            ctx.restore();
             nodeCnt++;
         }
         var t1 = new Date();
@@ -453,6 +480,8 @@
         canvas.setAttribute("height",this.options.dimensions[1]);
         var blah = this;
         this.element.append(canvas).mousemove(function(e){
+            //console.log("widget- " + e.pageX+","+e.pageY);
+            //console.log(blah._coordsToId(e.pageX,e.pageY));
             var offset = blah.element.offset();
             var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
             var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
@@ -466,7 +495,7 @@
                 {
                     nodes.push(blah.options.nodeList[ids[i]]);
                 }
-                var data = {"nodes": nodes};
+                var data = {"nodes": nodes, "ids": ids};
                 blah._trigger('mousemove',e,data);
             }
         });
@@ -490,7 +519,7 @@
     _refreshLayout: function(layoutMethod) {
         var t0 = new Date();
         var nodeCnt = 0;
-        function _processNodes(rect,children,nodes,area,layoutMethod) {
+        function _processNodes(rect,children,nodes,area,layoutMethod,header) {
             var a = [];
             for (var i = 0; i < children.length; i++) {
                 a[i]=nodes[children[i]].size*area;
@@ -503,17 +532,18 @@
             for (var i = 0; i < children.length; i++) {
                 if (nodes[children[i]].hasOwnProperty('children')) {
                     rect = nodes[children[i]].geometry;
-                    if ((children[i] != 0) && (rect[3]>0)) {
-                        rect = [rect[0],rect[1],rect[2],rect[3]];
+                    if ((children[i] != 0) && (rect[3]-header>0)) {
+                        rect = [rect[0],rect[1]+header,rect[2],rect[3]-header];
                     }
                     area = rect[2]*rect[3];
-                    _processNodes(rect,nodes[children[i]].children,nodes,area,layoutMethod);
+                    _processNodes(rect,nodes[children[i]].children,nodes,area,layoutMethod,header);
                 }
             }
         };
+        var header = this.options.groupHeaderHeight;
         var area = this.options.dimensions[0] * this.options.dimensions[1];
         var rect = [0,0,this.options.dimensions[0],this.options.dimensions[1]];
-        _processNodes(rect,[0],this.options.nodeList,area,layoutMethod);
+        _processNodes(rect,[0],this.options.nodeList,area,layoutMethod,header);
         var t1 = new Date();
         console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
     },

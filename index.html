@@ -7,7 +7,7 @@
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
-            #nodeHighlighter { position: absolute; display: none; border: 1px solid #fff; }
+            #highlighter { border: 1px solid #fff; position: absolute; display: none; }
         </style>
     </head>
     <body>
@@ -16,47 +16,62 @@
         <input id="t3" type="button" value="600x400"/>
         <input id="t4" type="button" value="destroy"/>
         <div id="treemap"></div>
-        <div id="nodeHighlighter"></div>
-        <div id="blah"><span><p>click the on button to create treemap</p></span></div>
+        <div id="debug-info"><span><p>click the on button to create treemap</p></span></div>
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
+        <div id="highlighter"></div>
 	    <script type="text/javascript">
-            var mousemoveHandler = function(e,data){
-                var offset = $("#treemap").offset();
-                var offsetX = parseInt(offset.left); // FF on mac offsets are floats
-                var offsetY = Math.ceil(offset.top); // FF on mac needed this round up
+            var currentNode;
+            var mousemoveHandler = function(e,data) {
+                //console.log("index.html- " + e.pageX + "," + e.pageY);
                 var nodes = data.nodes;
-                $("#blah").html("<span><p>" + e.pageX + ", " + e.pageY + "; nodes[0].label = " + nodes[0].label + "</p></span>");
-                $("#nodeHighlighter").css("display","inline");
-                $("#nodeHighlighter").css("left",nodes[0].geometry[0]+offsetX);
-                $("#nodeHighlighter").css("top",nodes[0].geometry[1]+offsetY);
-                $("#nodeHighlighter").css("width",nodes[0].geometry[2]);
-                $("#nodeHighlighter").css("height",nodes[0].geometry[3]);
+                var ids = data.ids;
+                $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + ids[0] + "; label = " + nodes[0].label + "</p></span>");
+                if ( nodes[0].hasOwnProperty('children')) {
+                    // group node
+                } else {
+                    var offset = $("#treemap").offset();
+                    $("#highlighter").css("display","inline");
+                    $("#highlighter").css("left",nodes[0].geometry[0]+offset.left);
+                    $("#highlighter").css("top",nodes[0].geometry[1]+offset.top);
+                    $("#highlighter").css("width",nodes[0].geometry[2]);
+                    $("#highlighter").css("height",nodes[0].geometry[3]);
+                    var rgb = nodes[0].computedColor;
+                    $("#highlighter").css("background-color","rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")");
+                    if (currentNode == undefined || currentNode != ids[0]){
+                        //console.log("new id " + ids[0]);
+                        currentNode = ids[0];
+                    }
+                }
             };
             var init = function(){
                 $("#t1").click(function(){
                     $("#treemap").treemap();
-                    $("#blah").html("<span><p>0,0</p></span>");
+                    $("#debug-info").html("<span><p>0,0</p></span>");
+                    //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
                     $("#treemap").bind('treemapmousemove',mousemoveHandler);
+                    $("#highlighter").bind('mousemove',function(e){
+                        console.log("blah " + e.pageX + "," + e.pageY );
+                    });
                 });
                 $("#t2").click(function(){
                     $("#treemap").treemap("option","dimensions",[800,200]);
-                    $("#nodeHighlighter").css("display","none");
+                    $("#highlighter").css("display","none");
                 });
                 $("#t3").click(function(){
                     $("#treemap").treemap("option","dimensions",[600,400]);
-                    $("#nodeHighlighter").css("display","none");
+                    $("#highlighter").css("display","none");
                 });
                 $("#t4").click(function(){
                     $("#treemap").unbind();
                     $("#treemap").treemap("destroy");
-                    $("#blah").html("<span><p>click the on button to create treemap</p></span>");
-                    $("#nodeHighlighter").css("display","none");
+                    $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
+                    $("#highlighter").css("display","none");
                 });
             };
-		$(document).ready(function(){
-            init();
-		});
-	</script>
+            $(document).ready(function(){
+                        init();
+            });
+        </script>
     </body>
 </html>
 
