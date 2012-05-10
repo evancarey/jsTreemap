@@ -417,7 +417,7 @@
         };
         var headerGradient = function(ctx,rect,rgb,headerHeight) {
             var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerHeight);
-            gradient.addColorStop(0,"#ffffff");
+            gradient.addColorStop(0,"#666");
             gradient.addColorStop(1,rgb2hex(rgb));
             return gradient;
         }
@@ -438,7 +438,7 @@
             ctx.save();
             if ( this.options.nodeList[i].hasOwnProperty('children')) {
                 // group node
-                ctx.fillStyle = headerGradient(ctx,rect,[64,64,64],this.options.groupHeaderHeight);
+                ctx.fillStyle = headerGradient(ctx,rect,[0,0,0],this.options.groupHeaderHeight);
             } else {
                 ctx.fillStyle = linearGradient(ctx,rect,rgb,.35);
             }
@@ -561,7 +561,7 @@
     },
 
     _addRunlength: function(x1,x2,y,id) {
-        if (!this.scanLines) {
+        if (this.scanLines === undefined) {
             this.scanLines = [];
         }
         y_str = parseInt(y);
