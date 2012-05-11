@@ -7,7 +7,7 @@
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
-            #highlighter { border: 1px solid #fff; position: absolute; display: none; pointer-events: none; }
+            .highlighter { border: 1px solid #fff; position: absolute; display: none; pointer-events: none; }
         </style>
     </head>
     <body>
@@ -20,27 +20,28 @@
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
         <div id="highlighter"></div>
 	    <script type="text/javascript">
-            var currentNode;
             var mousemoveHandler = function(e,data) {
-                //console.log("index.html- " + e.pageX + "," + e.pageY);
                 var nodes = data.nodes;
                 var ids = data.ids;
                 $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + ids[0] + "; label = " + nodes[0].label + "</p></span>");
-                if ( nodes[0].hasOwnProperty('children')) {
-                    // group node
-                } else {
+                $(".highlighter").hide();
+                $(".highlighter").css("background-color","");
+                for (var i = 0; i < nodes.length-1; i++) {
                     var offset = $("#treemap").offset();
-                    $("#highlighter").css("display","inline");
-                    $("#highlighter").css("left",nodes[0].geometry[0]+offset.left);
-                    $("#highlighter").css("top",nodes[0].geometry[1]+offset.top);
-                    $("#highlighter").css("width",nodes[0].geometry[2]);
-                    $("#highlighter").css("height",nodes[0].geometry[3]);
-                    var rgb = nodes[0].computedColor;
-                    $("#highlighter").css("background-color","rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")");
-                    if (currentNode == undefined || currentNode != ids[0]){
-                        //console.log("new id " + ids[0]);
-                        currentNode = ids[0];
+                    var divId = "highlighter"+i;
+                    if ( $("#"+divId).length == 0 ) {
+                        $("#highlighter").append("<div id=\""+divId+"\" class=\"highlighter\"></div>");
                     }
+                    $("#"+divId).css("display","inline");
+                    $("#"+divId).css("left",nodes[i].geometry[0]+offset.left);
+                    $("#"+divId).css("top",nodes[i].geometry[1]+offset.top);
+                    $("#"+divId).css("width",nodes[i].geometry[2]);
+                    $("#"+divId).css("height",nodes[i].geometry[3]);
+                    if (nodes[i].hasOwnProperty('children') === false) {
+                        var rgb = nodes[i].computedColor;
+                        $("#"+divId).css("background-color","rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")");
+                    }
+                    $("#"+divId).show();
                 }
             };
             var init = function(){
@@ -55,17 +56,17 @@
                 });
                 $("#t2").click(function(){
                     $("#treemap").treemap("option","dimensions",[800,200]);
-                    $("#highlighter").css("display","none");
+                    $(".highlighter").hide();
                 });
                 $("#t3").click(function(){
                     $("#treemap").treemap("option","dimensions",[600,400]);
-                    $("#highlighter").css("display","none");
+                    $(".highlighter").hide();
                 });
                 $("#t4").click(function(){
                     $("#treemap").unbind();
                     $("#treemap").treemap("destroy");
                     $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
-                    $("#highlighter").css("display","none");
+                    $(".highlighter").hide();
                 });
             };
             $(document).ready(function(){
