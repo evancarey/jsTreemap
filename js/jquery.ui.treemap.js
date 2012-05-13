@@ -478,10 +478,8 @@
         canvas = document.createElement("canvas");
         canvas.setAttribute("width",this.options.dimensions[0]);
         canvas.setAttribute("height",this.options.dimensions[1]);
-        var blah = this;
+        var blah = this; // to pass this to event handler
         this.element.append(canvas).mousemove(function(e){
-            //console.log("widget- " + e.pageX+","+e.pageY);
-            //console.log(blah._coordsToId(e.pageX,e.pageY));
             var offset = blah.element.offset();
             var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
             var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
@@ -497,6 +495,23 @@
                 }
                 var data = {"nodes": nodes, "ids": ids};
                 blah._trigger('mousemove',e,data);
+            }
+        }).click(function(e){
+            var offset = blah.element.offset();
+            var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
+            var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
+            var width = blah.options.dimensions[0];
+            var height = blah.options.dimensions[1];
+            if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
+            {
+                var ids = blah._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                var nodes = [];
+                for ( var i = 0; i < ids.length; i++ )
+                {
+                    nodes.push(blah.options.nodeList[ids[i]]);
+                }
+                var data = {"nodes": nodes, "ids": ids};
+                blah._trigger('click',e,data);
             }
         });
     },

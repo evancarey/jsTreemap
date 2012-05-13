@@ -20,53 +20,83 @@
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
         <div id="highlighter"></div>
 	    <script type="text/javascript">
+            var highlighterFadeTimeout;
+            var triggerHighlighterFade = function() {
+                $("#highlighter").fadeOut(800,"linear");
+            };
+            var clearHighlighterFade = function() {
+                clearTimeout(highlighterFadeTimeout);
+            };
+            var initHighlighterFade = function(duration) {
+                highlighterFadeTimeout = setTimeout('triggerHighlighterFade()',duration);
+            };
+            var mouseclickHandler = function(e,data) {
+                var nodes = data.nodes;
+                var ids = data.ids;
+                alert('you clicked '+nodes[0].label);
+            };
             var mousemoveHandler = function(e,data) {
                 var nodes = data.nodes;
                 var ids = data.ids;
                 $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + ids[0] + "; label = " + nodes[0].label + "</p></span>");
-                $(".highlighter").hide();
-                $(".highlighter").css("background-color","");
+                $(".highlighter").hide().css("background-color","");
                 for (var i = 0; i < nodes.length-1; i++) {
                     var offset = $("#treemap").offset();
                     var divId = "highlighter"+i;
                     if ( $("#"+divId).length == 0 ) {
                         $("#highlighter").append("<div id=\""+divId+"\" class=\"highlighter\"></div>");
                     }
-                    $("#"+divId).css("display","inline");
-                    $("#"+divId).css("left",nodes[i].geometry[0]+offset.left);
-                    $("#"+divId).css("top",nodes[i].geometry[1]+offset.top);
-                    $("#"+divId).css("width",nodes[i].geometry[2]);
-                    $("#"+divId).css("height",nodes[i].geometry[3]);
+                    $("#"+divId).css({
+                        "display":"inline",
+                        "left":nodes[i].geometry[0]+offset.left,
+                        "top":nodes[i].geometry[1]+offset.top,
+                        "width":nodes[i].geometry[2],
+                        "height":nodes[i].geometry[3]
+                    });
                     if (nodes[i].hasOwnProperty('children') === false) {
                         var rgb = nodes[i].computedColor;
                         $("#"+divId).css("background-color","rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")");
                     }
                     $("#"+divId).show();
                 }
+                if (highlighterFadeTimeout != undefined) clearHighlighterFade();
+                initHighlighterFade(3000);
+                $("#highlighter").show();
             };
             var init = function(){
                 $("#t1").click(function(){
-                    $("#treemap").treemap();
                     $("#debug-info").html("<span><p>0,0</p></span>");
-                    //$("#treemap").treemap({refresh:function(e,ui){alert("refresh");}});
-                    $("#treemap").bind('treemapmousemove',mousemoveHandler);
+                    $("#treemap").treemap()
+                    .bind('treemapmousemove',mousemoveHandler)
+                    .bind('treemapclick',mouseclickHandler);
                     $("#highlighter").bind('mousemove',function(e){
                         console.log("blah " + e.pageX + "," + e.pageY );
                     });
                 });
                 $("#t2").click(function(){
-                    $("#treemap").treemap("option","dimensions",[800,200]);
                     $(".highlighter").hide();
+                    $("#treemap").unbind()
+                    .treemap("option","dimensions",[800,200])
+                    .bind('treemapmousemove',mousemoveHandler)
+                    .bind('treemapclick',mouseclickHandler);
+                    $("#highlighter").bind('mousemove',function(e){
+                        console.log("blah " + e.pageX + "," + e.pageY );
+                    });
                 });
                 $("#t3").click(function(){
-                    $("#treemap").treemap("option","dimensions",[600,400]);
-                    $(".highlighter").hide();
+                    $(".highlighter").hide().unbind();
+                    $("#treemap").unbind()
+                    .treemap("option","dimensions",[600,400])
+                    .bind('treemapmousemove',mousemoveHandler)
+                    .bind('treemapclick',mouseclickHandler);
+                    $("#highlighter").bind('mousemove',function(e){
+                        console.log("blah " + e.pageX + "," + e.pageY );
+                    });
                 });
                 $("#t4").click(function(){
-                    $("#treemap").unbind();
-                    $("#treemap").treemap("destroy");
+                    $(".highlighter").hide().unbind();
+                    $("#treemap").unbind().treemap("destroy");
                     $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
-                    $(".highlighter").hide();
                 });
             };
             $(document).ready(function(){
