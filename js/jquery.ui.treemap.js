@@ -19,14 +19,22 @@
         colorGradient: { 
             resolution: 1024,
             colorStops : [
-                {"val":0,  "color":"#f03"},
-                {"val":.25,"color":"#f8a"},
+                {"val":0,  "color":"#a03"},
+                {"val":.25,"color":"#c77"},
                 {"val":.5, "color":"#fff"},
-                {"val":.75,"color":"#a8f"},
-                {"val":1,  "color":"#30f"}
-            ],
+                {"val":.75,"color":"#77c"},
+                {"val":1,  "color":"#30a"}
+            ]
         },
-        groupHeaderHeight: 12,
+        groupHeader: {
+            height: 12,
+            colorStops : [
+                {"val":0, "color":"#ccc"},
+                {"val":.4, "color":"#fff"},
+                {"val":.6, "color":"#fff"},
+                {"val":1, "color":"#777"}
+            ]
+        },
         nodeBorderWidth: 0,
         // For initial dev, node list is hard coded here.  
         // In future node list will be obtained from ajax call and/or setOption call.
@@ -260,9 +268,12 @@
                 this.options.dimensions = value;
                 this._refresh();
                 break;
-            case "colorGradient": // TODO: don't need to completely rebuild here. just update color gradient and re-render.
+            case "colorGradient":
                 this.options.colorGradient = value;
-                this._refresh();
+                //this._refresh();
+                this._refreshColorGradient();
+                this._render();
+                this._trigger("refresh",null,this.element);
                 break;
             case "nodeList":
                 this.options.nodeList = value;
@@ -273,8 +284,8 @@
 
     _refresh: function() {
         this._refreshCanvas();
-        this._refreshColorGradient();
         this._refreshLayout(this._squarify);
+        this._refreshColorGradient();
         this._render();
         this._trigger("refresh", null, this.element);
     },
@@ -415,15 +426,17 @@
         var avgRgb = function(rgb) {
             return Math.floor(sumArray(rgb)/3);
         };
-        var headerGradient = function(ctx,rect,rgb,headerHeight) {
-            var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerHeight);
-            gradient.addColorStop(0,"#666");
-            gradient.addColorStop(1,rgb2hex(rgb));
+        var headerGradient = function(ctx,rect,headerOptions) {
+            var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerOptions.height);
+            for (var i in headerOptions.colorStops) {
+                gradient.addColorStop(parseFloat(headerOptions.colorStops[i].val),headerOptions.colorStops[i].color);
+            }
             return gradient;
         }
         var linearGradient = function(ctx,rect,rgb,ratio) {
             var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0]+rect[2],rect[1]+rect[3]);
             gradient.addColorStop(0,rgb2hex(rgb));
+            gradient.addColorStop(0.65,rgb2hex(rgb));
             gradient.addColorStop(1,darkerColor(rgb2hex(rgb),ratio));
             return gradient;
         };
@@ -438,9 +451,9 @@
             ctx.save();
             if ( this.options.nodeList[i].hasOwnProperty('children')) {
                 // group node
-                ctx.fillStyle = headerGradient(ctx,rect,[0,0,0],this.options.groupHeaderHeight);
+                ctx.fillStyle = headerGradient(ctx,rect,this.options.groupHeader);
             } else {
-                ctx.fillStyle = linearGradient(ctx,rect,rgb,.35);
+                ctx.fillStyle = linearGradient(ctx,rect,rgb,.1);
             }
             ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
             if ( this.options.nodeList[i].hasOwnProperty('children')) {
@@ -448,12 +461,12 @@
                 ctx.lineWidth = 0.5;
                 ctx.beginPath();
                 ctx.moveTo(rect[0],rect[1]);
-                ctx.lineTo(rect[0],rect[1]+this.options.groupHeaderHeight);
+                ctx.lineTo(rect[0],rect[1]+this.options.groupHeader.height);
                 ctx.closePath();
                 ctx.stroke();
                 ctx.beginPath();
                 ctx.moveTo(rect[0]+rect[2],rect[1]);
-                ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeaderHeight);
+                ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeader.height);
                 ctx.closePath();
                 ctx.stroke();
             }
@@ -555,7 +568,7 @@
                 }
             }
         };
-        var header = this.options.groupHeaderHeight;
+        var header = this.options.groupHeader.height;
         var area = this.options.dimensions[0] * this.options.dimensions[1];
         var rect = [0,0,this.options.dimensions[0],this.options.dimensions[1]];
         _processNodes(rect,[0],this.options.nodeList,area,layoutMethod,header);

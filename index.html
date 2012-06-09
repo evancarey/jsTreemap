@@ -14,7 +14,9 @@
         <input id="t1" type="button" value="on"/>
         <input id="t2" type="button" value="800x200"/>
         <input id="t3" type="button" value="600x400"/>
-        <input id="t4" type="button" value="destroy"/>
+        <input id="t4" type="button" value="color1"/>
+        <input id="t5" type="button" value="color2"/>
+        <input id="t6" type="button" value="destroy"/>
         <div id="treemap"></div>
         <div id="debug-info"><span><p>click the on button to create treemap</p></span></div>
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
@@ -93,10 +95,32 @@
                         console.log("blah " + e.pageX + "," + e.pageY );
                     });
                 });
-                $("#t4").click(function(){
+                $("#t6").click(function(){
                     $(".highlighter").hide().unbind();
                     $("#treemap").unbind().treemap("destroy");
                     $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
+                });
+                $("#t4").click(function(){
+                    $("#treemap").treemap("option","colorGradient",{
+                        resolution:1024,
+                        colorStops:[
+                            {"val":0,  "color":"#a03"},
+                            {"val":.25,"color":"#c77"},
+                            {"val":.5, "color":"#fff"},
+                            {"val":.75,"color":"#77c"},
+                            {"val":1,  "color":"#30a"}
+                        ]
+                    });
+                });
+                $("#t5").click(function(){
+                    $("#treemap").treemap("option","colorGradient",{
+                        resolution:1024,
+                        colorStops:[
+                            {"val":0,"color":"#770"},
+                            {"val":0.5,"color":"#fff"},
+                            {"val":1,"color":"#077"}
+                        ]
+                    });
                 });
             };
             $(document).ready(function(){
