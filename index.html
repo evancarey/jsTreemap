@@ -16,10 +16,11 @@
         <input id="t3" type="button" value="600x400"/>
         <input id="t4" type="button" value="color1"/>
         <input id="t5" type="button" value="color2"/>
-        <input id="t6" type="button" value="gradient2"/>
-        <input id="t7" type="button" value="destroy"/>
+        <input id="t6" type="button" value="gradient1"/>
+        <input id="t7" type="button" value="gradient2"/>
+        <input id="t8" type="button" value="destroy"/>
         <div id="treemap"></div>
-        <div id="debug-info"><span><p>click the on button to create treemap</p></span></div>
+        <div id="debug-info"><span><p>click the 'on' button to create test treemap</p></span></div>
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
         <div id="highlighter"></div>
 	    <script type="text/javascript">
@@ -96,24 +97,19 @@
                         console.log("blah " + e.pageX + "," + e.pageY );
                     });
                 });
-                $("#t7").click(function(){
-                    $(".highlighter").hide().unbind();
-                    $("#treemap").unbind().treemap("destroy");
-                    $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
-                });
-                $("#t4").click(function(){
+                $("#t5").click(function(){
                     $("#treemap").treemap("option","colorGradient",{
                         resolution:1024,
                         colorStops:[
-                            {"val":0,  "color":"#a03"},
-                            {"val":.25,"color":"#c77"},
+                            {"val":0,  "color":"#a00"},
+                            {"val":.4,"color":"#f00"},
                             {"val":.5, "color":"#fff"},
-                            {"val":.75,"color":"#77c"},
-                            {"val":1,  "color":"#30a"}
+                            {"val":.6,"color":"#0f0"},
+                            {"val":1,  "color":"#070"}
                         ]
                     });
                 });
-                $("#t5").click(function(){
+                $("#t4").click(function(){
                     $("#treemap").treemap("option","colorGradient",{
                         resolution:1024,
                         colorStops:[
@@ -134,6 +130,21 @@
                         gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                         return gradient;
                     })
+                });
+                $("#t7").click(function(){
+                    $("#treemap").treemap("option","nodeGradient",function(ctx,rect,rgb){
+                        var min = Math.min(rect[2],rect[3]);
+                        var gradient = ctx.createLinearGradient(rect[0]+rect[2]-min,rect[1]+rect[3]-min,rect[0]+rect[2],rect[1]+rect[3]);
+                        gradient.addColorStop(0,TreemapUtils.rgb2hex(rgb));
+                        gradient.addColorStop(0.7,TreemapUtils.rgb2hex(rgb));
+                        gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
+                        return gradient;
+                    })
+                });
+                $("#t8").click(function(){
+                    $(".highlighter").hide().unbind();
+                    $("#treemap").unbind().treemap("destroy");
+                    $("#debug-info").html("<span><p>click the on button to create treemap</p></span>");
                 });
             };
             $(document).ready(function(){

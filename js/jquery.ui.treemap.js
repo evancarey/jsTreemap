@@ -19,11 +19,9 @@
             colorGradient: { 
                 resolution: 1024,
                 colorStops : [
-                    {"val":0,  "color":"#a03"},
-                    {"val":.25,"color":"#c77"},
-                    {"val":.5, "color":"#fff"},
-                    {"val":.75,"color":"#77c"},
-                    {"val":1,  "color":"#30a"}
+                    {"val":0,"color":"#770"},
+                    {"val":0.5,"color":"#fff"},
+                    {"val":1,"color":"#077"}
                 ]
             },
             groupHeader: {
@@ -36,10 +34,12 @@
                 ]
             },
             nodeGradient: function(ctx,rect,rgb) {
-                var min = Math.min(rect[2],rect[3]);
-                var gradient = ctx.createLinearGradient(rect[0]+rect[2]-min,rect[1]+rect[3]-min,rect[0]+rect[2],rect[1]+rect[3]);
-                gradient.addColorStop(0,TreemapUtils.rgb2hex(rgb));
-                gradient.addColorStop(0.7,TreemapUtils.rgb2hex(rgb));
+                var r1 = Math.min(rect[2],rect[3])*0.1;
+                var r2 = Math.max(rect[2],rect[3]);
+                var x = rect[0]+rect[2]*0.5;
+                var y = rect[1]+rect[3]*0.5;
+                var gradient = ctx.createRadialGradient(x,y,r1,x,y,r2);
+                gradient.addColorStop(0,TreemapUtils.lighterColor(TreemapUtils.rgb2hex(rgb),0.2));
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
