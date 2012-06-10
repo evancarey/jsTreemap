@@ -36,7 +36,8 @@
                 ]
             },
             nodeGradient: function(ctx,rect,rgb) {
-                var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0]+rect[2],rect[1]+rect[3]);
+                var min = Math.min(rect[2],rect[3]);
+                var gradient = ctx.createLinearGradient(rect[0]+rect[2]-min,rect[1]+rect[3]-min,rect[0]+rect[2],rect[1]+rect[3]);
                 gradient.addColorStop(0,TreemapUtils.rgb2hex(rgb));
                 gradient.addColorStop(0.65,TreemapUtils.rgb2hex(rgb));
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.1));
