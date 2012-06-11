@@ -127,20 +127,6 @@
 
         _squarify: function(rect,vals) {
             //
-            // sumArray is copied from: 
-            // http://stackoverflow.com/questions/3762589/fastest-javascript-summation
-            // 
-            var sumArray = function() {
-                // Use one adding function rather than create a new one each
-                // time sumArray is called.
-                function add(a,b) {
-                    return a + b;
-                }
-                return function(arr) {
-                    return arr.reduce(add);
-                };
-            }();
-            //
             // Non-recursive version of algorithm published in:
             // "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
             // http://www.win.tue.nl/~vanwijk/stm.pdf
@@ -189,7 +175,7 @@
             var worst = function(r,w) {
                 var rMax = Math.max.apply(null,r);
                 var rMin = Math.min.apply(null,r);
-                var s = sumArray(r);
+                var s = TreemapUtils.sumArray(r);
                 var sSqr = s*s;
                 var wSqr = w*w;
                 return Math.max((wSqr*rMax)/sSqr,sSqr/(wSqr*rMin));
@@ -203,7 +189,7 @@
                 var maxX = x + subrect.getW();
                 var maxY = y + subrect.getH();
                 if (subrect.getW() < subrect.getH()) {
-                    var rowHeight = Math.ceil(sumArray(row)/subrect.getW());
+                    var rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getW());
                     if (y+rowHeight >= maxY) { rowHeight = maxY-y; }
                     for (var i = 0; i < row.length; i++) {
                         var w = Math.ceil(row[i]/rowHeight);
@@ -213,7 +199,7 @@
                     }
                     subrect.setY(y+rowHeight);
                 } else {
-                    var rowHeight = Math.ceil(sumArray(row)/subrect.getH());
+                    var rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getH());
                     if (x+rowHeight >= maxX) { rowHeight = maxX-x; }
                     for (var i = 0; i < row.length; i++) {
                         var w = Math.ceil(row[i]/rowHeight);
@@ -323,6 +309,7 @@
             this._clearScanLines();
             for (var i in this.options.nodeList) {
                 var rect = this.options.nodeList[i].geometry;
+                var text = this.options.nodeList[i].label;
                 var rgb = this._getRgbColor(this.options.nodeList[i].color);
                 this.options.nodeList[i].computedColor = rgb;
                 ctx.save();
@@ -346,10 +333,27 @@
                     ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeader.height);
                     ctx.closePath();
                     ctx.stroke();
+                    //
+                    ctx.fillStyle = '#000'; // TODO: make an option value
+                    ctx.font = 'italic 10px sans-serif'; // TODO: make option value
+                    ctx.fillText(text,rect[0],rect[1]+10);
+		        } else {
+		            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
+                        ctx.fillStyle = '#fff'; // TODO: make an option value
+		            } else {
+                        ctx.fillStyle = '#888'; // TODO: make an option value
+                    }
+                    // TODO: improve text fill of node
+                    if (text.length > 13) {
+                        text = text.substr(0,13);
+                        text += '...';
+                    }
+                    //ctx.font = 'italic 10px sans-serif'; // TODO: make an option value
+                    var textMetrics = ctx.measureText(text);
+                    var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
+                    ctx.font = 'italic '+ptSize+'px sans-serif';
+                    ctx.fillText(text,rect[0],rect[1]+ptSize);
                 }
-                //ctx.beginPath();
-                //ctx.rect(rect[0],rect[1],rect[2],rect[3]);
-                //ctx.clip();
                 ctx.restore();
                 for (var j = 0; j < rect[3]; j++) {
                     this._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),i);
@@ -509,6 +513,21 @@
 var TreemapUtils = TreemapUtils || {};
 
 //
+// sumArray is copied from: 
+// http://stackoverflow.com/questions/3762589/fastest-javascript-summation
+// 
+TreemapUtils.sumArray = function() {
+    // Use one adding function rather than create a new one each
+    // time sumArray is called.
+    function add(a,b) {
+        return a + b;
+    }
+    return function(arr) {
+        return arr.reduce(add);
+    };
+}();
+
+//
 // Color shifting algo from: http://stackoverflow.com/questions/1507931/generate-lighter-darker-color-in-css-using-javascript
 // 
 // Modified to use the lpad function defined below.
@@ -606,7 +625,7 @@ TreemapUtils.rgb2hex = function(rgb) {
 };
 
 TreemapUtils.avgRgb = function(rgb) {
-    return Math.floor(sumArray(rgb)/3);
+    return Math.floor(TreemapUtils.sumArray(rgb)/3);
 };
 
 //

@@ -7,7 +7,7 @@
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
-            .highlighter { border: 1px solid #fff; position: absolute; display: none; pointer-events: none; }
+            .highlighter { border: 1px solid #ff0; position: absolute; display: none; pointer-events: none; }
         </style>
     </head>
     <body>
@@ -57,10 +57,10 @@
                         "width":nodes[i].geometry[2],
                         "height":nodes[i].geometry[3]
                     });
-                    if (nodes[i].hasOwnProperty('children') === false) {
+                    /*if (nodes[i].hasOwnProperty('children') === false) {
                         var rgb = nodes[i].computedColor;
-                        $("#"+divId).css("background-color","rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")");
-                    }
+                        $("#"+divId).css("background-color","rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.0)");
+                    }*/
                     $("#"+divId).show();
                 }
                 if (highlighterFadeTimeout != undefined) clearHighlighterFade();
