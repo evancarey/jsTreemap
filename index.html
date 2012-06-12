@@ -8,6 +8,17 @@
         <style type="text/css">
             canvas { border: 1px solid #f00; }
             .highlighter { border: 1px solid #ff0; position: absolute; display: none; pointer-events: none; }
+            .mouseoverbox { 
+                border: 1px solid #aaa; 
+                position: absolute; 
+                background-color: #fff; 
+                pointer-events: none; 
+            }
+            .mouseoverbox p {
+                margin: 0px;
+                padding: 0px;
+                font-size: 0.875em;
+            }
         </style>
     </head>
     <body>
@@ -23,6 +34,7 @@
         <div id="debug-info"><span><p>click the 'on' button to create test treemap</p></span></div>
         <div><p><a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
         <div id="highlighter"></div>
+        <div id="mouseoverbox" class="mouseoverbox"></div>
 	    <script type="text/javascript">
             var highlighterFadeTimeout;
             var triggerHighlighterFade = function() {
@@ -34,17 +46,29 @@
             var initHighlighterFade = function(duration) {
                 highlighterFadeTimeout = setTimeout('triggerHighlighterFade()',duration);
             };
+            var mouseoverboxFadeTimeout;
+            var triggerMouseoverboxFade = function() {
+                $("#mouseoverbox").fadeOut(800,"linear");
+            };
+            var clearMouseoverboxFade = function() {
+                clearTimeout(mouseoverboxFadeTimeout);
+            };
+            var initMouseoverboxFade = function(duration) {
+                mouseoverboxFadeTimeout = setTimeout('triggerMouseoverboxFade()',duration);
+            };
             var mouseclickHandler = function(e,data) {
                 var nodes = data.nodes;
                 var ids = data.ids;
                 alert('you clicked '+nodes[0].label);
             };
             var mousemoveHandler = function(e,data) {
-                var nodes = data.nodes;
-                var ids = data.ids;
-                $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + ids[0] + "; label = " + nodes[0].label + "</p></span>");
+                $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
+                updateHighlighter(e,data);
+                updateMouseoverbox(e,data);
+            };
+            var updateHighlighter = function(e,data) {
                 $(".highlighter").hide().css("background-color","");
-                for (var i = 0; i < nodes.length-1; i++) {
+                for (var i = 0; i < data.nodes.length-1; i++) {
                     var offset = $("#treemap").offset();
                     var divId = "highlighter"+i;
                     if ( $("#"+divId).length == 0 ) {
@@ -52,13 +76,13 @@
                     }
                     $("#"+divId).css({
                         "display":"inline",
-                        "left":nodes[i].geometry[0]+offset.left,
-                        "top":nodes[i].geometry[1]+offset.top,
-                        "width":nodes[i].geometry[2],
-                        "height":nodes[i].geometry[3]
+                        "left":data.nodes[i].geometry[0]+offset.left,
+                        "top":data.nodes[i].geometry[1]+offset.top,
+                        "width":data.nodes[i].geometry[2],
+                        "height":data.nodes[i].geometry[3]
                     });
-                    /*if (nodes[i].hasOwnProperty('children') === false) {
-                        var rgb = nodes[i].computedColor;
+                    /*if (data.nodes[i].hasOwnProperty('children') === false) {
+                        var rgb = data.nodes[i].computedColor;
                         $("#"+divId).css("background-color","rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.0)");
                     }*/
                     $("#"+divId).show();
@@ -67,15 +91,24 @@
                 initHighlighterFade(3000);
                 $("#highlighter").show();
             };
+            var updateMouseoverbox = function(e,data) {
+                $(".mouseoverbox").hide();
+                $("#mouseoverbox").css({
+                    // TODO: position based on treemap dimensions
+                    "left":e.pageX+16,
+                    "top":e.pageY
+                });
+                $("#mouseoverbox").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
+                if (mouseoverboxFadeTimeout != undefined) clearMouseoverboxFade();
+                initMouseoverboxFade(3000);
+                $("#mouseoverbox").show();
+            };
             var init = function(){
                 $("#t1").click(function(){
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap()
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler);
-                    $("#highlighter").bind('mousemove',function(e){
-                        console.log("blah " + e.pageX + "," + e.pageY );
-                    });
                 });
                 $("#t2").click(function(){
                     $(".highlighter").hide();
@@ -83,9 +116,6 @@
                     .treemap("option","dimensions",[800,200])
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler);
-                    $("#highlighter").bind('mousemove',function(e){
-                        console.log("blah " + e.pageX + "," + e.pageY );
-                    });
                 });
                 $("#t3").click(function(){
                     $(".highlighter").hide().unbind();
@@ -93,9 +123,6 @@
                     .treemap("option","dimensions",[600,400])
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler);
-                    $("#highlighter").bind('mousemove',function(e){
-                        console.log("blah " + e.pageX + "," + e.pageY );
-                    });
                 });
                 $("#t5").click(function(){
                     $("#treemap").treemap("option","colorGradient",{

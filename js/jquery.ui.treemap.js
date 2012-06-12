@@ -267,14 +267,16 @@
                     this.options.nodeGradient = value;
                     //this._refresh();
                     //this._refreshColorGradient();
-                    this._render();
+                    this._renderNodes();
+                    this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
                 case "colorGradient":
                     this.options.colorGradient = value;
                     //this._refresh();
                     this._refreshColorGradient();
-                    this._render();
+                    this._renderNodes();
+                    this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
                 case "nodeList":
@@ -288,11 +290,12 @@
             this._refreshCanvas();
             this._refreshLayout(this._squarify);
             this._refreshColorGradient();
-            this._render();
+            this._renderNodes();
+            this._renderNodeLabels();
             this._trigger("refresh", null, this.element);
         },
 
-        _render: function() {
+        _renderNodes: function() {
             var t0 = new Date();
             
             var headerGradient = function(ctx,rect,headerOptions) {
@@ -309,7 +312,6 @@
             this._clearScanLines();
             for (var i in this.options.nodeList) {
                 var rect = this.options.nodeList[i].geometry;
-                var text = this.options.nodeList[i].label;
                 var rgb = this._getRgbColor(this.options.nodeList[i].color);
                 this.options.nodeList[i].computedColor = rgb;
                 ctx.save();
@@ -333,27 +335,7 @@
                     ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeader.height);
                     ctx.closePath();
                     ctx.stroke();
-                    //
-                    ctx.fillStyle = '#000'; // TODO: make an option value
-                    ctx.font = 'italic 10px sans-serif'; // TODO: make option value
-                    ctx.fillText(text,rect[0],rect[1]+10);
-		        } else {
-		            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
-                        ctx.fillStyle = '#fff'; // TODO: make an option value
-		            } else {
-                        ctx.fillStyle = '#888'; // TODO: make an option value
-                    }
-                    // TODO: improve text fill of node
-                    if (text.length > 13) {
-                        text = text.substr(0,13);
-                        text += '...';
-                    }
-                    //ctx.font = 'italic 10px sans-serif'; // TODO: make an option value
-                    var textMetrics = ctx.measureText(text);
-                    var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
-                    ctx.font = 'italic '+ptSize+'px sans-serif';
-                    ctx.fillText(text,rect[0],rect[1]+ptSize);
-                }
+		        }
                 ctx.restore();
                 for (var j = 0; j < rect[3]; j++) {
                     this._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),i);
@@ -362,6 +344,51 @@
             }
             var t1 = new Date();
             console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
+        },
+
+        _renderNodeLabels: function() {
+            // TODO: variable size based on node size | fixed size and position
+            var t0 = new Date();
+            var canvas = this.element.find("canvas")[0];
+            var ctx = canvas.getContext("2d");
+            var nodeCnt = 0;
+            for (var i in this.options.nodeList) {
+                var rect = this.options.nodeList[i].geometry;
+                var text = this.options.nodeList[i].label;
+                var rgb = this._getRgbColor(this.options.nodeList[i].color);
+                ctx.save();
+                if ( this.options.nodeList[i].hasOwnProperty('children')) {
+                    // Group Node
+                    ctx.fillStyle = '#000'; // TODO: make an option value
+                    ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
+                    ctx.fillText(text,rect[0],rect[1]+10);
+		        } else {
+                    // Leaf Node
+		            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
+                        ctx.fillStyle = '#fff'; // TODO: make an option value
+		            } else {
+                        ctx.fillStyle = '#888'; // TODO: make an option value
+                    }
+                    /* TODO: improve text fill of node
+                    if (text.length > 13) {
+                        text = text.substr(0,13);
+                        text += '...';
+                    }*/
+                    /* Vary font size
+                    var textMetrics = ctx.measureText(text);
+                    var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
+                    ctx.font = 'italic '+ptSize+'px sans-serif';
+                    ctx.fillText(text,rect[0],rect[1]+ptSize);
+                    */
+                    // TODO: only render text that fits node
+                    ctx.font = 'italic 0.625em sans-serif';
+                    ctx.fillText(text,rect[0],rect[1]+10);
+                }
+                ctx.restore();
+                nodeCnt++;
+            }
+            var t1 = new Date();
+            console.log("Render Node Labels: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
 
         _refreshCanvas: function() {
