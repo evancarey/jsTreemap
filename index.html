@@ -19,6 +19,7 @@
                 margin: 0px;
                 padding: 0px;
                 font-size: 0.875em;
+                color: #444;
             }
         </style>
     </head>
@@ -95,9 +96,9 @@
             var updateMouseoverbox = function(e,data) {
                 $(".mouseoverbox").hide();
                 if (data.nodes[0].hasOwnProperty('children') === false) {
-                    $("#mouseoverbox").css({"background-color":"#fff"});
+                    $("#mouseoverbox").css({"background-color":"rgba(255,255,255,0.8)"});
                 } else {
-                    $("#mouseoverbox").css({"background-color":"#ffd"});
+                    $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.8)"});
                 }
                 $("#mouseoverbox").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
                 var mouseoverboxWidth = $("#mouseoverbox").width();

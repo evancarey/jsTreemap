@@ -364,7 +364,7 @@
                 ctx.clip();
                 if ( this.options.nodeList[i].hasOwnProperty('children')) {
                     // Group Node
-                    ctx.fillStyle = '#000'; // TODO: make an option value
+                    ctx.fillStyle = '#555'; // TODO: make an option value
                     ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
                     ctx.fillText(text,rect[0],rect[1]+10);
 		        } else {
