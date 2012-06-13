@@ -359,6 +359,9 @@
                 var text = this.options.nodeList[i].label;
                 var rgb = this._getRgbColor(this.options.nodeList[i].color);
                 ctx.save();
+                ctx.beginPath();
+                ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                ctx.clip();
                 if ( this.options.nodeList[i].hasOwnProperty('children')) {
                     // Group Node
                     ctx.fillStyle = '#000'; // TODO: make an option value
