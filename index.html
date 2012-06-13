@@ -7,6 +7,7 @@
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
+            #treemap { display: inline-block; }
             .highlighter { border: 1px solid #ff0; position: absolute; display: none; pointer-events: none; }
             .mouseoverbox { 
                 border: 1px solid #aaa; 
@@ -93,12 +94,27 @@
             };
             var updateMouseoverbox = function(e,data) {
                 $(".mouseoverbox").hide();
-                $("#mouseoverbox").css({
-                    // TODO: position based on treemap dimensions
-                    "left":e.pageX+16,
-                    "top":e.pageY
-                });
+                if (data.nodes[0].hasOwnProperty('children') === false) {
+                    $("#mouseoverbox").css({"background-color":"#fff"});
+                } else {
+                    $("#mouseoverbox").css({"background-color":"#ffd"});
+                }
                 $("#mouseoverbox").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
+                var mouseoverboxWidth = $("#mouseoverbox").width();
+                var mouseoverboxHeight = $("#mouseoverbox").height();
+                var treemapWidth = $("#treemap").width();
+                var treemapHeight = $("#treemap").height();
+                var treemapOffset = $("#treemap").offset();
+                if (e.pageX + mouseoverboxWidth > treemapOffset.left + treemapWidth) {
+                    $("#mouseoverbox").css({ "left":e.pageX-mouseoverboxWidth-8 });
+                } else {
+                    $("#mouseoverbox").css({ "left":e.pageX+16 });
+                }
+                if (e.pageY + mouseoverboxHeight > treemapOffset.top + treemapHeight) {
+                    $("#mouseoverbox").css({ "top":e.pageY-mouseoverboxHeight });
+                } else {
+                    $("#mouseoverbox").css({ "top":e.pageY });
+                }
                 if (mouseoverboxFadeTimeout != undefined) clearMouseoverboxFade();
                 initMouseoverboxFade(3000);
                 $("#mouseoverbox").show();

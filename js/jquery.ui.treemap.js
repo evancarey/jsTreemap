@@ -311,7 +311,7 @@
             var nodeCnt = 0;
             this._clearScanLines();
             for (var i in this.options.nodeList) {
-                if ( i == 0 ) continue; // skip root node
+                //if ( i == 0 ) continue; // skip root node
                 var rect = this.options.nodeList[i].geometry;
                 var rgb = this._getRgbColor(this.options.nodeList[i].color);
                 this.options.nodeList[i].computedColor = rgb;
