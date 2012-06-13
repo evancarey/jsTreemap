@@ -106,7 +106,7 @@
                 var treemapWidth = $("#treemap").width();
                 var treemapHeight = $("#treemap").height();
                 var treemapOffset = $("#treemap").offset();
-                if (e.pageX + mouseoverboxWidth > treemapOffset.left + treemapWidth) {
+                if (e.pageX + mouseoverboxWidth + 16 > treemapOffset.left + treemapWidth) {
                     $("#mouseoverbox").css({ "left":e.pageX-mouseoverboxWidth-8 });
                 } else {
                     $("#mouseoverbox").css({ "left":e.pageX+16 });
