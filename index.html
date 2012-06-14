@@ -40,7 +40,7 @@
 	    <script type="text/javascript">
             var highlighterFadeTimeout;
             var triggerHighlighterFade = function() {
-                $("#highlighter").fadeOut(800,"linear");
+                $("#highlighter").fadeOut(400,"linear");
             };
             var clearHighlighterFade = function() {
                 clearTimeout(highlighterFadeTimeout);
@@ -50,7 +50,7 @@
             };
             var mouseoverboxFadeTimeout;
             var triggerMouseoverboxFade = function() {
-                $("#mouseoverbox").fadeOut(800,"linear");
+                $("#mouseoverbox").fadeOut(400,"linear");
             };
             var clearMouseoverboxFade = function() {
                 clearTimeout(mouseoverboxFadeTimeout);
@@ -67,6 +67,13 @@
                 $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
                 updateHighlighter(e,data);
                 updateMouseoverbox(e,data);
+            };
+            var mouseleaveHandler = function() {
+                //console.log("mouseleaveHandler");
+                clearMouseoverboxFade();
+                triggerMouseoverboxFade();
+                clearHighlighterFade();
+                triggerHighlighterFade();
             };
             var updateHighlighter = function(e,data) {
                 $(".highlighter").hide().css("background-color","");
@@ -90,7 +97,7 @@
                     $("#"+divId).show();
                 }
                 if (highlighterFadeTimeout != undefined) clearHighlighterFade();
-                initHighlighterFade(3000);
+                initHighlighterFade(30000);
                 $("#highlighter").show();
             };
             var updateMouseoverbox = function(e,data) {
@@ -117,7 +124,7 @@
                     $("#mouseoverbox").css({ "top":e.pageY });
                 }
                 if (mouseoverboxFadeTimeout != undefined) clearMouseoverboxFade();
-                initMouseoverboxFade(3000);
+                initMouseoverboxFade(30000);
                 $("#mouseoverbox").show();
             };
             var init = function(){
@@ -125,21 +132,24 @@
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap()
                     .bind('treemapmousemove',mousemoveHandler)
-                    .bind('treemapclick',mouseclickHandler);
+                    .bind('treemapclick',mouseclickHandler)
+                    .mouseleave(function(){mouseleaveHandler()});
                 });
                 $("#t2").click(function(){
                     $(".highlighter").hide();
                     $("#treemap").unbind()
                     .treemap("option","dimensions",[800,200])
                     .bind('treemapmousemove',mousemoveHandler)
-                    .bind('treemapclick',mouseclickHandler);
+                    .bind('treemapclick',mouseclickHandler)
+                    .mouseleave(function(){mouseleaveHandler()});
                 });
                 $("#t3").click(function(){
                     $(".highlighter").hide().unbind();
                     $("#treemap").unbind()
                     .treemap("option","dimensions",[600,400])
                     .bind('treemapmousemove',mousemoveHandler)
-                    .bind('treemapclick',mouseclickHandler);
+                    .bind('treemapclick',mouseclickHandler)
+                    .mouseleave(function(){mouseleaveHandler()});
                 });
                 $("#t5").click(function(){
                     $("#treemap").treemap("option","colorGradient",{
