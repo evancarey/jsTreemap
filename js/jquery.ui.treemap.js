@@ -44,74 +44,80 @@
                 return gradient;
             },
             nodeBorderWidth: 0,
-            // For initial dev, node list is hard coded here.  
-            // In future node list will be obtained from ajax call and/or setOption call.
-            // nodeList format subject to change after working through rendering.
-            nodeList: [
-                {"size":1.0, "color":.74, "label":"root", "children":[1,2,3,4,5,6,7]},
-                {"size":.25, "color":.39, "label":"blah1", "parent":0, "children":[8,9,10,11,12,13,14]},
-                {"size":.25, "color":.52, "label":"blah2", "parent":0, "children":[15,16,17,18,19,20,21]},
-                {"size":.16667, "color":.74, "label":"blah3", "parent":0, "children":[22,23,24,25,26,27,28]},
-                {"size":.125, "color":.52, "label":"blah4", "parent":0, "children":[29,30,31,32,33,34,35]},
-                {"size":.083333, "color":.39, "label":"blah5", "parent":0, "children":[36,37,38,39,40,41,42]},
-                {"size":.083333, "color":.98, "label":"blah6", "parent":0, "children":[43,44,45,46,47,48,49]},
-                {"size":.041666667, "color":.85, "label":"blah7", "parent":0, "children":[50,51,52,53,54,55,56]},
-                {"size":.25, "color":.74, "label":"blah11\nbleep\nblue", "parent":1},
-                {"size":.25, "color":.98, "label":"blah12", "parent":1},
-                {"size":.16667, "color":.39, "label":"blah13", "parent":1},
-                {"size":.125, "color":.19, "label":"blah14", "parent":1},
-                {"size":.083333, "color":.52, "label":"blah15", "parent":1},
-                {"size":.083333, "color":.98, "label":"blah16", "parent":1},
-                {"size":.041666667, "color":.74, "label":"blah17", "parent":1},
-                {"size":.25, "color":.32, "label":"blah21", "parent":2},
-                {"size":.25, "color":.39, "label":"blah22", "parent":2},
-                {"size":.16667, "color":.32, "label":"blah23", "parent":2},
-                {"size":.125, "color":.85, "label":"blah24", "parent":2},
-                {"size":.083333, "color":.52, "label":"blah25", "parent":2},
-                {"size":.083333, "color":.63, "label":"blah26", "parent":2},
-                {"size":.041666667, "color":.19, "label":"blah27", "parent":2},
-                {"size":.25, "color":.39, "label":"blah31", "parent":3},
-                {"size":.25, "color":.85, "label":"blah32", "parent":3},
-                {"size":.16667, "color":.63, "label":"blah33", "parent":3, "children":[57,58,59,60,61,62,63]},
-                {"size":.125, "color":.52, "label":"blah34", "parent":3},
-                {"size":.083333, "color":.74, "label":"blah35", "parent":3},
-                {"size":.083333, "color":.29, "label":"blah36", "parent":3},
-                {"size":.041666667, "color":.98, "label":"blah37", "parent":3},
-                {"size":.25, "color":.19, "label":"blah41", "parent":4},
-                {"size":.25, "color":.52, "label":"blah42", "parent":4},
-                {"size":.16667, "color":.09, "label":"blah43", "parent":4},
-                {"size":.125, "color":.32, "label":"blah44", "parent":4},
-                {"size":.083333, "color":.39, "label":"blah45", "parent":4},
-                {"size":.083333, "color":.31, "label":"blah46", "parent":4},
-                {"size":.041666667, "color":.74, "label":"blah47", "parent":4},
-                {"size":.25, "color":.31, "label":"blah51", "parent":5},
-                {"size":.25, "color":.85, "label":"blah52", "parent":5},
-                {"size":.16667, "color":.63, "label":"blah53", "parent":5},
-                {"size":.125, "color":.52, "label":"blah54", "parent":5},
-                {"size":.083333, "color":.98, "label":"blah55", "parent":5},
-                {"size":.083333, "color":.32, "label":"blah56", "parent":5},
-                {"size":.041666667, "color":.39, "label":"blah57", "parent":5},
-                {"size":.25, "color":.19, "label":"blah61", "parent":6},
-                {"size":.25, "color":.74, "label":"blah62", "parent":6},
-                {"size":.16667, "color":.29, "label":"blah63", "parent":6},
-                {"size":.125, "color":.52, "label":"blah64", "parent":6},
-                {"size":.083333, "color":.74, "label":"blah65", "parent":6},
-                {"size":.083333, "color":.39, "label":"blah66", "parent":6},
-                {"size":.041666667, "color":.63, "label":"blah67", "parent":6},
-                {"size":.25, "color":.39, "label":"blah71", "parent":7},
-                {"size":.25, "color":.52, "label":"blah72", "parent":7},
-                {"size":.16667, "color":.74, "label":"blah73", "parent":7},
-                {"size":.125, "color":.85, "label":"blah74", "parent":7},
-                {"size":.083333, "color":.98, "label":"blah75", "parent":7},
-                {"size":.083333, "color":.74, "label":"blah76", "parent":7},
-                {"size":.041666667, "color":.52, "label":"blah77", "parent":7},
-                {"size":.25, "color":.39, "label":"blah331", "parent":33},
-                {"size":.25, "color":.85, "label":"blah332", "parent":33},
-                {"size":.16667, "color":.63, "label":"blah333", "parent":33},
-                {"size":.125, "color":.52, "label":"blah334", "parent":33},
-                {"size":.083333, "color":.74, "label":"blah335", "parent":33},
-                {"size":.083333, "color":.29, "label":"blah336", "parent":33},
-                {"size":.041666667, "color":.98, "label":"blah337", "parent":33}
+            nodeData: [
+                {"id":"2fc414e2-ae59-41ed-8cba-377be0950b9d", "label":"root", "size":1.0, "color":.74, "children":[
+                    {"id":"23f627dc-6078-403e-96d3-c05aabf9f2c9", "label":"blah1", "size":.25, "color":.39, "children":[
+                        {"id":"ce96d31f-24fa-4258-bd25-c94191096c86", "label":"blah11", "size":.25, "color":.74},
+                        {"id":"91e0ea1d-47e9-4520-b991-2fdb7d73caf1", "label":"blah12", "size":.25, "color":.98},
+                        {"id":"62188591-f1b2-42df-a6aa-6831a8c53352", "label":"blah13", "size":.16667, "color":.39},
+                        {"id":"b80861a4-cdad-49fa-b6f3-aa8508f2bf7d", "label":"blah14", "size":.125, "color":.19},
+                        {"id":"9216f340-4949-472b-8246-b25a71dd9916", "label":"blah15", "size":.083333, "color":.52},
+                        {"id":"40236148-e7b4-4a0d-ba33-463b814ba736", "label":"blah16", "size":.083333, "color":.98},
+                        {"id":"c12264b7-e79e-444d-b357-6b002f0ada65", "label":"blah17", "size":.041666667, "color":.74}
+                    ]},
+                    {"id":"126debf5-aa68-45bb-9603-8808d6bfdb79", "label":"blah2", "size":.25, "color":.52, "children":[
+                        {"id":"634c7555-31a8-4d35-adf3-b078b91b6fa1", "label":"blah21", "size":.25, "color":.32},
+                        {"id":"2eac5833-59f8-49df-be6d-5debc8af0a83", "label":"blah22", "size":.25, "color":.39},
+                        {"id":"50790bdd-f30d-4c52-960f-ec396a20ecc1", "label":"blah23", "size":.16667, "color":.32},
+                        {"id":"15b8f1e1-e0ee-4780-9d12-dc483384e678", "label":"blah24", "size":.125, "color":.85},
+                        {"id":"4e14522d-04bc-4a1c-8c66-3a847d38782d", "label":"blah25", "size":.083333, "color":.52},
+                        {"id":"92cf9150-3b91-47dd-8dce-d9a4c9c7e8ee", "label":"blah26", "size":.083333, "color":.63},
+                        {"id":"97794307-46b8-44eb-865d-3d8c2a95ea83", "label":"blah27", "size":.041666667, "color":.19}
+                    ]},
+                    {"id":"7e3f0349-ce9d-4aea-a203-0e0a0cc45ada", "label":"blah3", "size":.16667, "color":.74, "children":[
+                        {"id":"1dbf73a8-585b-4075-9f63-c16201204a03", "label":"blah31", "size":.25, "color":.39},
+                        {"id":"caefaba5-ab72-4445-8f9d-ce1e62f68606", "label":"blah32", "size":.25, "color":.85},
+                        {"id":"89bd30be-b249-41d0-a24b-6fe4a5c20ffe", "label":"blah33", "size":.16667, "color":.63, "children":[
+                            {"id":"7d56b381-3543-4ada-8a9b-86a8adce97a2", "label":"blah331", "size":.25, "color":.39},
+                            {"id":"5f3fcf29-7b66-46cc-955d-9fe3ba08d37a", "label":"blah332", "size":.25, "color":.85},
+                            {"id":"50aa205c-57e7-4c6a-b2f9-a50df14593ff", "label":"blah333", "size":.16667, "color":.63},
+                            {"id":"beba7a53-cc5c-4fd8-8de0-3263f3e9973c", "label":"blah334", "size":.125, "color":.52},
+                            {"id":"b15f0ae4-179d-4557-b755-57c25a69c150", "label":"blah335", "size":.083333, "color":.74},
+                            {"id":"cecbda69-3736-457e-8128-674277e618cf", "label":"blah336", "size":.083333, "color":.29},
+                            {"id":"496c7052-6826-4860-8ebd-70ee441ac3e3", "label":"blah337", "size":.041666667, "color":.98}
+                        ]},
+                        {"id":"57582ef2-b933-485f-9b20-8db82db7403e", "label":"blah34", "size":.125, "color":.52},
+                        {"id":"ef593822-a89f-4241-98fe-973349ad487d", "label":"blah35", "size":.083333, "color":.74},
+                        {"id":"c93cd65d-a96c-4090-b277-9ddc5f645b06", "label":"blah36", "size":.083333, "color":.29},
+                        {"id":"81c3e4d8-7ea9-4f7c-a401-01c901b2e9ad", "label":"blah37", "size":.041666667, "color":.98}
+                    ]},
+                    {"id":"a3bec3a8-55b6-4d05-a2bc-b289ed1ad346", "label":"blah4", "size":.125, "color":.52, "children":[
+                        {"id":"27605654-f4fb-4ec0-8967-9c6aaa96934b", "label":"blah41", "size":.25, "color":.19},
+                        {"id":"a113de2d-80b1-4223-b040-bb21fb332669", "label":"blah42", "size":.25, "color":.52},
+                        {"id":"121fec09-0654-4de1-b27e-3ff23e25dac0", "label":"blah43", "size":.16667, "color":.09},
+                        {"id":"0b1c34bf-ae59-40df-a89e-3b9a05feec8d", "label":"blah44", "size":.125, "color":.32},
+                        {"id":"6e4576d4-cf15-4c4a-93c2-8408d40a1253", "label":"blah45", "size":.083333, "color":.39},
+                        {"id":"55d92db9-52c1-4709-a96b-592c8f886247", "label":"blah46", "size":.083333, "color":.31},
+                        {"id":"8dca9e0e-6e40-461f-b3fc-e5c3dde35153", "label":"blah47", "size":.041666667, "color":.74}
+                    ]},
+                    {"id":"c467043d-b862-4bd5-b7c2-056f4d743a5e", "label":"blah5", "size":.083333, "color":.39, "children":[
+                        {"id":"e0b3ced3-96c4-4f01-97e6-8867526eff71", "label":"blah51", "size":.25, "color":.31},
+                        {"id":"904ad26e-fde0-41d8-8b5e-97907a1f51c7", "label":"blah52", "size":.25, "color":.85},
+                        {"id":"8f58816c-e1d5-4594-9f9e-85d6a11f0ac8", "label":"blah53", "size":.16667, "color":.63},
+                        {"id":"ee1ca0bb-a4af-43e2-adcd-8fa9ed4f05b5", "label":"blah54", "size":.125, "color":.52},
+                        {"id":"1f7df236-7854-4aac-8e31-b1aded537c86", "label":"blah55", "size":.083333, "color":.98},
+                        {"id":"e411614a-30c9-4a0f-9855-52de98a37a64", "label":"blah56", "size":.083333, "color":.32},
+                        {"id":"234fa244-33cd-42dd-b4ad-291ea8bc8fae", "label":"blah57", "size":.041666667, "color":.39}
+                    ]},
+                    {"id":"ae6f93e2-9c4c-4f6c-87e2-0260aebeba55", "label":"blah6", "size":.083333, "color":.98, "children":[
+                        {"id":"4511fee8-ae17-4df1-b84b-a3e1a66ea470", "label":"blah61", "size":.25, "color":.19},
+                        {"id":"ab206acd-b0f7-4789-9f17-35b54ce119d9", "label":"blah62", "size":.25, "color":.74},
+                        {"id":"d436ff53-076d-4b8a-86cc-c102ebf58a3f", "label":"blah63", "size":.16667, "color":.29},
+                        {"id":"25a300d6-c361-43ec-b9e1-bad3399383b8", "label":"blah64", "size":.125, "color":.52},
+                        {"id":"391c72a8-1db8-4d7c-a84f-51200d092159", "label":"blah65", "size":.083333, "color":.74},
+                        {"id":"7071d634-c233-45a2-a169-f0fbe2403292", "label":"blah66", "size":.083333, "color":.39},
+                        {"id":"939985e5-1872-4ec4-90d7-1b3c5ab62a2f", "label":"blah67", "size":.041666667, "color":.63}
+                    ]},
+                    {"id":"08095bd4-0942-470c-92fc-eb042d9f14f3", "label":"blah7", "size":.041666667, "color":.85, "children":[
+                        {"id":"0e27d9c9-4b20-44ec-b22b-d19947d1d8c4", "label":"blah71", "size":.25, "color":.39},
+                        {"id":"2fa79804-ac2c-47c6-a370-80790742f3d7", "label":"blah72", "size":.25, "color":.52},
+                        {"id":"e3ede063-f42b-4573-af6b-c0a3f9281483", "label":"blah73", "size":.16667, "color":.74},
+                        {"id":"40e92699-fae5-4703-9520-fe5f5fa56ef6", "label":"blah74", "size":.125, "color":.85},
+                        {"id":"9296b705-2bd0-4c77-a5f2-2cbe775fa84a", "label":"blah75", "size":.083333, "color":.98},
+                        {"id":"432db33d-f5a3-4acd-a5ef-739b0de091c0", "label":"blah76", "size":.083333, "color":.74},
+                        {"id":"4a01b07c-fa6b-4ce6-a12a-2c28c5310475", "label":"blah77", "size":.041666667, "color":.52}
+                    ]},
+                ]},
             ]
         },  
 
@@ -279,8 +285,8 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
-                case "nodeList":
-                    this.options.nodeList = value;
+                case "nodeData":
+                    this.options.nodeData = value;
                     this._refresh();
                     break;
             }  
@@ -296,102 +302,114 @@
         },
 
         _renderNodes: function() {
-            var t0 = new Date();
-            
             var headerGradient = function(ctx,rect,headerOptions) {
                 var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerOptions.height);
                 for (var i in headerOptions.colorStops) {
                     gradient.addColorStop(parseFloat(headerOptions.colorStops[i].val),headerOptions.colorStops[i].color);
                 }
                 return gradient;
-            }
-
-            var canvas = this.element.find("canvas")[0];
+            };
+            var processNodes = function(nodes) {
+                for (var i = 0; i < nodes.length; i++) {
+                    //console.log(nodes[i].label);
+                    var rect = nodes[i].geometry;
+                    var rgb = that._getRgbColor(nodes[i].color);
+                    nodes[i].computedColor = rgb;
+                    ctx.save();
+                    if ( nodes[i].hasOwnProperty('children')) {
+                        // group node
+                        ctx.fillStyle = headerGradient(ctx,rect,that.options.groupHeader);
+                    } else {
+                        ctx.fillStyle = that.options.nodeGradient.call(that,ctx,rect,rgb);
+                    }
+                    ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
+                    if ( nodes[i].hasOwnProperty('children')) {
+                        ctx.strokeStyle = "#000";
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(rect[0],rect[1]);
+                        ctx.lineTo(rect[0],rect[1]+that.options.groupHeader.height);
+                        ctx.closePath();
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(rect[0]+rect[2],rect[1]);
+                        ctx.lineTo(rect[0]+rect[2],rect[1]+that.options.groupHeader.height);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    for (var j = 0; j < rect[3]; j++) {
+                        that._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),nodes[i].id);
+                    }
+                    nodeCnt++;
+                    if (nodes[i].hasOwnProperty('children')) {
+                        processNodes(nodes[i].children);
+                    }
+                }
+            };
+            var t0 = new Date();
+            var that = this;
+            var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
             var nodeCnt = 0;
-            this._clearScanLines();
-            for (var i in this.options.nodeList) {
-                //if ( i == 0 ) continue; // skip root node
-                var rect = this.options.nodeList[i].geometry;
-                var rgb = this._getRgbColor(this.options.nodeList[i].color);
-                this.options.nodeList[i].computedColor = rgb;
-                ctx.save();
-                if ( this.options.nodeList[i].hasOwnProperty('children')) {
-                    // group node
-                    ctx.fillStyle = headerGradient(ctx,rect,this.options.groupHeader);
-                } else {
-                    ctx.fillStyle = this.options.nodeGradient.call(this,ctx,rect,rgb);
-                }
-                ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
-                if ( this.options.nodeList[i].hasOwnProperty('children')) {
-                    ctx.strokeStyle = "#000";
-                    ctx.lineWidth = 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(rect[0],rect[1]);
-                    ctx.lineTo(rect[0],rect[1]+this.options.groupHeader.height);
-                    ctx.closePath();
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(rect[0]+rect[2],rect[1]);
-                    ctx.lineTo(rect[0]+rect[2],rect[1]+this.options.groupHeader.height);
-                    ctx.closePath();
-                    ctx.stroke();
-		        }
-                ctx.restore();
-                for (var j = 0; j < rect[3]; j++) {
-                    this._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),i);
-                }
-                nodeCnt++;
-            }
+            that._clearScanLines();
+            processNodes(that.options.nodeData);
             var t1 = new Date();
             console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
 
         _renderNodeLabels: function() {
+            var processNodes = function(nodes) {
+                for (var i = 0; i < nodes.length; i++) {
+                    //console.log(nodes[i].label);
+                    var rect = nodes[i].geometry;
+                    var rgb = nodes[i].computedColor;
+                    var text = nodes[i].label;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                    ctx.clip();
+                    if ( nodes[i].hasOwnProperty('children')) {
+                        // Group Node
+                        ctx.fillStyle = '#555'; // TODO: make an option value
+                        ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
+                        ctx.fillText(text,rect[0],rect[1]+10);
+                    } else {
+                        // Leaf Node
+                        if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
+                            ctx.fillStyle = '#fff'; // TODO: make an option value
+                        } else {
+                            ctx.fillStyle = '#888'; // TODO: make an option value
+                        }
+                        /* TODO: improve text fill of node
+                        if (text.length > 13) {
+                            text = text.substr(0,13);
+                            text += '...';
+                        }*/
+                        /* Vary font size
+                        var textMetrics = ctx.measureText(text);
+                        var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
+                        ctx.font = 'italic '+ptSize+'px sans-serif';
+                        ctx.fillText(text,rect[0],rect[1]+ptSize);
+                        */
+                        // TODO: only render text that fits node
+                        ctx.font = 'italic 0.625em sans-serif';
+                        ctx.fillText(text,rect[0],rect[1]+10);
+                    }
+                    ctx.restore();
+                    if (nodes[i].hasOwnProperty('children')) {
+                        processNodes(nodes[i].children);
+                    }
+                    nodeCnt++;
+                }
+            };
             // TODO: variable size based on node size | fixed size and position
             var t0 = new Date();
-            var canvas = this.element.find("canvas")[0];
+            var that = this;
+            var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
             var nodeCnt = 0;
-            for (var i in this.options.nodeList) {
-                if ( i == 0 ) continue; // skip root node
-                var rect = this.options.nodeList[i].geometry;
-                var text = this.options.nodeList[i].label;
-                var rgb = this._getRgbColor(this.options.nodeList[i].color);
-                ctx.save();
-                ctx.beginPath();
-                ctx.rect(rect[0],rect[1],rect[2],rect[3]);
-                ctx.clip();
-                if ( this.options.nodeList[i].hasOwnProperty('children')) {
-                    // Group Node
-                    ctx.fillStyle = '#555'; // TODO: make an option value
-                    ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
-                    ctx.fillText(text,rect[0],rect[1]+10);
-		        } else {
-                    // Leaf Node
-		            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
-                        ctx.fillStyle = '#fff'; // TODO: make an option value
-		            } else {
-                        ctx.fillStyle = '#888'; // TODO: make an option value
-                    }
-                    /* TODO: improve text fill of node
-                    if (text.length > 13) {
-                        text = text.substr(0,13);
-                        text += '...';
-                    }*/
-                    /* Vary font size
-                    var textMetrics = ctx.measureText(text);
-                    var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
-                    ctx.font = 'italic '+ptSize+'px sans-serif';
-                    ctx.fillText(text,rect[0],rect[1]+ptSize);
-                    */
-                    // TODO: only render text that fits node
-                    ctx.font = 'italic 0.625em sans-serif';
-                    ctx.fillText(text,rect[0],rect[1]+10);
-                }
-                ctx.restore();
-                nodeCnt++;
-            }
+            processNodes(that.options.nodeData);
             var t1 = new Date();
             console.log("Render Node Labels: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
@@ -404,40 +422,40 @@
             canvas = document.createElement("canvas");
             canvas.setAttribute("width",this.options.dimensions[0]);
             canvas.setAttribute("height",this.options.dimensions[1]);
-            var blah = this; // to pass this to event handler
+            var that = this; // to pass this to event handler
             this.element.append(canvas).mousemove(function(e){
-                var offset = blah.element.offset();
+                var offset = that.element.offset();
                 var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
                 var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
-                var width = blah.options.dimensions[0];
-                var height = blah.options.dimensions[1];
+                var width = that.options.dimensions[0];
+                var height = that.options.dimensions[1];
                 if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
                 {
-                    var ids = blah._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                    var ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
                     var nodes = [];
                     for ( var i = 0; i < ids.length; i++ )
                     {
-                        nodes.push(blah.options.nodeList[ids[i]]);
+                        nodes.push(that._getNode([ids[i]]));
                     }
                     var data = {"nodes": nodes, "ids": ids};
-                    blah._trigger('mousemove',e,data);
+                    that._trigger('mousemove',e,data);
                 }
             }).click(function(e){
-                var offset = blah.element.offset();
+                var offset = that.element.offset();
                 var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
                 var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
-                var width = blah.options.dimensions[0];
-                var height = blah.options.dimensions[1];
+                var width = that.options.dimensions[0];
+                var height = that.options.dimensions[1];
                 if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
                 {
-                    var ids = blah._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                    var ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
                     var nodes = [];
                     for ( var i = 0; i < ids.length; i++ )
                     {
-                        nodes.push(blah.options.nodeList[ids[i]]);
+                        nodes.push(that._getNode([ids[i]]));
                     }
                     var data = {"nodes": nodes, "ids": ids};
-                    blah._trigger('click',e,data);
+                    that._trigger('click',e,data);
                 }
             });
         },
@@ -458,36 +476,36 @@
         },
 
         _refreshLayout: function(layoutMethod) {
-            var t0 = new Date();
-            var nodeCnt = 0;
-            function _processNodes(rect,children,nodes,area,layoutMethod,header) {
+            function _processNodes(rect,nodes,area,layoutMethod,header) {
                 var a = [];
-                console.log("children.length = "+children.length);
-                for (var i = 0; i < children.length; i++) {
-                    console.log("i = "+i);
-                    console.log("children["+i+"] = "+children[i]);
-                    a[i]=nodes[children[i]].size*area;
+                for (var i = 0; i < nodes.length; i++) {
+                    a[i]=nodes[i].size*area;
                 }
                 var b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 nodeCnt += b.length;
-                for (var i = 0; i < children.length; i++) {
-                    nodes[children[i]].geometry = b[i];//.slice();
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].geometry = b[i];//.slice();
+                    that._addNode2NodeList(nodes[i]);
                 }
-                for (var i = 0; i < children.length; i++) {
-                    if (nodes[children[i]].hasOwnProperty('children')) {
-                        rect = nodes[children[i]].geometry;
-                        if ((children[i] != 0) && (rect[3]-header>0)) {
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i].hasOwnProperty('children')) {
+                        rect = nodes[i].geometry;
+                        if (that.options.nodeData[0] !== nodes[i] && (rect[3]-header>0)) { // skips root node
                             rect = [rect[0],rect[1]+header,rect[2],rect[3]-header];
                         }
                         area = rect[2]*rect[3];
-                        _processNodes(rect,nodes[children[i]].children,nodes,area,layoutMethod,header);
+                        _processNodes(rect,nodes[i].children,area,layoutMethod,header);
                     }
                 }
             };
-            var header = this.options.groupHeader.height;
-            var area = this.options.dimensions[0] * this.options.dimensions[1];
-            var rect = [0,0,this.options.dimensions[0],this.options.dimensions[1]];
-            _processNodes(rect,[0],this.options.nodeList,area,layoutMethod,header);
+            var t0 = new Date();
+            var that = this;
+            var nodeCnt = 0;
+            var header = that.options.groupHeader.height;
+            var area = that.options.dimensions[0] * that.options.dimensions[1];
+            var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
+            that._clearNodeList();
+            _processNodes(rect,that.options.nodeData,area,layoutMethod,header);
             var t1 = new Date();
             console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
@@ -531,6 +549,26 @@
                 }
             }
             return ids;
+        },
+
+        // nodeList is internal index into nodeData nodes
+        _clearNodeList: function() {
+            if (this.nodeList) {
+                this.nodeList.length = 0;
+            }
+        },
+
+        _addNode2NodeList: function(node) {
+            if (this.nodeList === undefined) {
+                this.nodeList = [];
+            }
+            if (!this.nodeList[node.id]) {
+                this.nodeList[node.id] = node;
+            }
+        },
+
+        _getNode: function(id){
+            return this.nodeList[id];
         },
 
         // Use the destroy method to clean up any modifications your widget has made to the DOM

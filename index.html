@@ -61,7 +61,7 @@
             var mouseclickHandler = function(e,data) {
                 var nodes = data.nodes;
                 var ids = data.ids;
-                alert('you clicked '+nodes[0].label);
+                alert('you clicked node with id '+nodes[0].id);
             };
             var mousemoveHandler = function(e,data) {
                 $("#debug-info").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
@@ -107,7 +107,7 @@
                 } else {
                     $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.8)"});
                 }
-                $("#mouseoverbox").html("<span><p>" + e.pageX + ", " + e.pageY + "; id = " + data.ids[0] + "; label = " + data.nodes[0].label + "</p></span>");
+                $("#mouseoverbox").html("<span><p>" + data.nodes[0].label + "</p></span>");
                 var mouseoverboxWidth = $("#mouseoverbox").width();
                 var mouseoverboxHeight = $("#mouseoverbox").height();
                 var treemapWidth = $("#treemap").width();
