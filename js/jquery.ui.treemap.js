@@ -267,19 +267,15 @@
                 case "dimensions":
                     this.options.dimensions = value;
                     this._refresh();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "nodeGradient":
                     this.options.nodeGradient = value;
-                    //this._refresh();
-                    //this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
                 case "colorGradient":
                     this.options.colorGradient = value;
-                    //this._refresh();
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
@@ -311,15 +307,13 @@
             };
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
-                    //console.log(nodes[i].label);
                     var rect = nodes[i].geometry;
                     var rgb = that._getRgbColor(nodes[i].color);
                     nodes[i].computedColor = rgb;
                     ctx.save();
-                    if ( nodes[i].hasOwnProperty('children')) {
-                        // group node
+                    if ( nodes[i].hasOwnProperty('children')) { // group node
                         ctx.fillStyle = headerGradient(ctx,rect,that.options.groupHeader);
-                    } else {
+                    } else { // leaf node
                         ctx.fillStyle = that.options.nodeGradient.call(that,ctx,rect,rgb);
                     }
                     ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
@@ -361,42 +355,44 @@
         _renderNodeLabels: function() {
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
-                    //console.log(nodes[i].label);
-                    var rect = nodes[i].geometry;
-                    var rgb = nodes[i].computedColor;
-                    var text = nodes[i].label;
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.rect(rect[0],rect[1],rect[2],rect[3]);
-                    ctx.clip();
-                    if ( nodes[i].hasOwnProperty('children')) {
-                        // Group Node
-                        ctx.fillStyle = '#555'; // TODO: make an option value
-                        ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
-                        ctx.fillText(text,rect[0],rect[1]+10);
-                    } else {
-                        // Leaf Node
-                        if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
-                            ctx.fillStyle = '#fff'; // TODO: make an option value
+                    if (that.options.nodeData[0] !== nodes[i]){ // skip root node
+                        //console.log(nodes[i].label);
+                        var rect = nodes[i].geometry;
+                        var rgb = nodes[i].computedColor;
+                        var text = nodes[i].label;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                        ctx.clip();
+                        if ( nodes[i].hasOwnProperty('children')) {
+                            // Group Node
+                            ctx.fillStyle = '#555'; // TODO: make an option value
+                            ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
+                            ctx.fillText(text,rect[0],rect[1]+10);
                         } else {
-                            ctx.fillStyle = '#888'; // TODO: make an option value
+                            // Leaf Node
+                            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
+                                ctx.fillStyle = '#fff'; // TODO: make an option value
+                            } else {
+                                ctx.fillStyle = '#888'; // TODO: make an option value
+                            }
+                            /* TODO: improve text fill of node
+                            if (text.length > 13) {
+                                text = text.substr(0,13);
+                                text += '...';
+                            }*/
+                            /* Vary font size
+                            var textMetrics = ctx.measureText(text);
+                            var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
+                            ctx.font = 'italic '+ptSize+'px sans-serif';
+                            ctx.fillText(text,rect[0],rect[1]+ptSize);
+                            */
+                            // TODO: only render text that fits node
+                            ctx.font = 'italic 0.625em sans-serif';
+                            ctx.fillText(text,rect[0],rect[1]+10);
                         }
-                        /* TODO: improve text fill of node
-                        if (text.length > 13) {
-                            text = text.substr(0,13);
-                            text += '...';
-                        }*/
-                        /* Vary font size
-                        var textMetrics = ctx.measureText(text);
-                        var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
-                        ctx.font = 'italic '+ptSize+'px sans-serif';
-                        ctx.fillText(text,rect[0],rect[1]+ptSize);
-                        */
-                        // TODO: only render text that fits node
-                        ctx.font = 'italic 0.625em sans-serif';
-                        ctx.fillText(text,rect[0],rect[1]+10);
+                        ctx.restore();
                     }
-                    ctx.restore();
                     if (nodes[i].hasOwnProperty('children')) {
                         processNodes(nodes[i].children);
                     }

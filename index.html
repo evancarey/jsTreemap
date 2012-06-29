@@ -5,6 +5,7 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
+        <script type="text/javascript" src="blah.js"></script>
         <style type="text/css">
             canvas { border: 1px solid #f00; }
             #treemap { display: inline-block; }
@@ -18,7 +19,7 @@
             .mouseoverbox p {
                 margin: 0px;
                 padding: 0px;
-                font-size: 0.875em;
+                font-size: 0.625em;
                 color: #444;
             }
         </style>
@@ -107,7 +108,12 @@
                 } else {
                     $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.8)"});
                 }
-                $("#mouseoverbox").html("<span><p>" + data.nodes[0].label + "</p></span>");
+                $("#mouseoverbox").html("<span>"
+			+ "<p>" + data.nodes[0].label 
+			+ "</p><p>x = " + blah[data.nodes[0].id].x + "</p>"
+			+ "</p><p>y = " + blah[data.nodes[0].id].y + "</p>"
+			+ "</p><p>z = " + blah[data.nodes[0].id].z + "</p>"
+			+ "</span>");
                 var mouseoverboxWidth = $("#mouseoverbox").width();
                 var mouseoverboxHeight = $("#mouseoverbox").height();
                 var treemapWidth = $("#treemap").width();
