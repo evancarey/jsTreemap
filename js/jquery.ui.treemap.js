@@ -34,97 +34,26 @@
                 ]
             },
             nodeGradient: function(ctx,rect,rgb) {
+                //console.log("rect="+rect);
                 var r1 = Math.min(rect[2],rect[3])*0.1;
                 var r2 = Math.max(rect[2],rect[3]);
                 var x = rect[0]+rect[2]*0.5;
                 var y = rect[1]+rect[3]*0.5;
+                //console.log("x="+x+";y="+y);
                 var gradient = ctx.createRadialGradient(x,y,r1,x,y,r2);
                 gradient.addColorStop(0,TreemapUtils.lighterColor(TreemapUtils.rgb2hex(rgb),0.2));
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
+            sizeOption: 0,
+            colorOption: 0,
             nodeBorderWidth: 0,
-            nodeData: [
-                {"id":"2fc414e2-ae59-41ed-8cba-377be0950b9d", "label":"root", "size":1.0, "color":.74, "children":[
-                    {"id":"23f627dc-6078-403e-96d3-c05aabf9f2c9", "label":"blah1", "size":.25, "color":.39, "children":[
-                        {"id":"ce96d31f-24fa-4258-bd25-c94191096c86", "label":"blah11", "size":.25, "color":.74},
-                        {"id":"91e0ea1d-47e9-4520-b991-2fdb7d73caf1", "label":"blah12", "size":.25, "color":.98},
-                        {"id":"62188591-f1b2-42df-a6aa-6831a8c53352", "label":"blah13", "size":.16667, "color":.39},
-                        {"id":"b80861a4-cdad-49fa-b6f3-aa8508f2bf7d", "label":"blah14", "size":.125, "color":.19},
-                        {"id":"9216f340-4949-472b-8246-b25a71dd9916", "label":"blah15", "size":.083333, "color":.52},
-                        {"id":"40236148-e7b4-4a0d-ba33-463b814ba736", "label":"blah16", "size":.083333, "color":.98},
-                        {"id":"c12264b7-e79e-444d-b357-6b002f0ada65", "label":"blah17", "size":.041666667, "color":.74}
-                    ]},
-                    {"id":"126debf5-aa68-45bb-9603-8808d6bfdb79", "label":"blah2", "size":.25, "color":.52, "children":[
-                        {"id":"634c7555-31a8-4d35-adf3-b078b91b6fa1", "label":"blah21", "size":.25, "color":.32},
-                        {"id":"2eac5833-59f8-49df-be6d-5debc8af0a83", "label":"blah22", "size":.25, "color":.39},
-                        {"id":"50790bdd-f30d-4c52-960f-ec396a20ecc1", "label":"blah23", "size":.16667, "color":.32},
-                        {"id":"15b8f1e1-e0ee-4780-9d12-dc483384e678", "label":"blah24", "size":.125, "color":.85},
-                        {"id":"4e14522d-04bc-4a1c-8c66-3a847d38782d", "label":"blah25", "size":.083333, "color":.52},
-                        {"id":"92cf9150-3b91-47dd-8dce-d9a4c9c7e8ee", "label":"blah26", "size":.083333, "color":.63},
-                        {"id":"97794307-46b8-44eb-865d-3d8c2a95ea83", "label":"blah27", "size":.041666667, "color":.19}
-                    ]},
-                    {"id":"7e3f0349-ce9d-4aea-a203-0e0a0cc45ada", "label":"blah3", "size":.16667, "color":.74, "children":[
-                        {"id":"1dbf73a8-585b-4075-9f63-c16201204a03", "label":"blah31", "size":.25, "color":.39},
-                        {"id":"caefaba5-ab72-4445-8f9d-ce1e62f68606", "label":"blah32", "size":.25, "color":.85},
-                        {"id":"89bd30be-b249-41d0-a24b-6fe4a5c20ffe", "label":"blah33", "size":.16667, "color":.63, "children":[
-                            {"id":"7d56b381-3543-4ada-8a9b-86a8adce97a2", "label":"blah331", "size":.25, "color":.39},
-                            {"id":"5f3fcf29-7b66-46cc-955d-9fe3ba08d37a", "label":"blah332", "size":.25, "color":.85},
-                            {"id":"50aa205c-57e7-4c6a-b2f9-a50df14593ff", "label":"blah333", "size":.16667, "color":.63},
-                            {"id":"beba7a53-cc5c-4fd8-8de0-3263f3e9973c", "label":"blah334", "size":.125, "color":.52},
-                            {"id":"b15f0ae4-179d-4557-b755-57c25a69c150", "label":"blah335", "size":.083333, "color":.74},
-                            {"id":"cecbda69-3736-457e-8128-674277e618cf", "label":"blah336", "size":.083333, "color":.29},
-                            {"id":"496c7052-6826-4860-8ebd-70ee441ac3e3", "label":"blah337", "size":.041666667, "color":.98}
-                        ]},
-                        {"id":"57582ef2-b933-485f-9b20-8db82db7403e", "label":"blah34", "size":.125, "color":.52},
-                        {"id":"ef593822-a89f-4241-98fe-973349ad487d", "label":"blah35", "size":.083333, "color":.74},
-                        {"id":"c93cd65d-a96c-4090-b277-9ddc5f645b06", "label":"blah36", "size":.083333, "color":.29},
-                        {"id":"81c3e4d8-7ea9-4f7c-a401-01c901b2e9ad", "label":"blah37", "size":.041666667, "color":.98}
-                    ]},
-                    {"id":"a3bec3a8-55b6-4d05-a2bc-b289ed1ad346", "label":"blah4", "size":.125, "color":.52, "children":[
-                        {"id":"27605654-f4fb-4ec0-8967-9c6aaa96934b", "label":"blah41", "size":.25, "color":.19},
-                        {"id":"a113de2d-80b1-4223-b040-bb21fb332669", "label":"blah42", "size":.25, "color":.52},
-                        {"id":"121fec09-0654-4de1-b27e-3ff23e25dac0", "label":"blah43", "size":.16667, "color":.09},
-                        {"id":"0b1c34bf-ae59-40df-a89e-3b9a05feec8d", "label":"blah44", "size":.125, "color":.32},
-                        {"id":"6e4576d4-cf15-4c4a-93c2-8408d40a1253", "label":"blah45", "size":.083333, "color":.39},
-                        {"id":"55d92db9-52c1-4709-a96b-592c8f886247", "label":"blah46", "size":.083333, "color":.31},
-                        {"id":"8dca9e0e-6e40-461f-b3fc-e5c3dde35153", "label":"blah47", "size":.041666667, "color":.74}
-                    ]},
-                    {"id":"c467043d-b862-4bd5-b7c2-056f4d743a5e", "label":"blah5", "size":.083333, "color":.39, "children":[
-                        {"id":"e0b3ced3-96c4-4f01-97e6-8867526eff71", "label":"blah51", "size":.25, "color":.31},
-                        {"id":"904ad26e-fde0-41d8-8b5e-97907a1f51c7", "label":"blah52", "size":.25, "color":.85},
-                        {"id":"8f58816c-e1d5-4594-9f9e-85d6a11f0ac8", "label":"blah53", "size":.16667, "color":.63},
-                        {"id":"ee1ca0bb-a4af-43e2-adcd-8fa9ed4f05b5", "label":"blah54", "size":.125, "color":.52},
-                        {"id":"1f7df236-7854-4aac-8e31-b1aded537c86", "label":"blah55", "size":.083333, "color":.98},
-                        {"id":"e411614a-30c9-4a0f-9855-52de98a37a64", "label":"blah56", "size":.083333, "color":.32},
-                        {"id":"234fa244-33cd-42dd-b4ad-291ea8bc8fae", "label":"blah57", "size":.041666667, "color":.39}
-                    ]},
-                    {"id":"ae6f93e2-9c4c-4f6c-87e2-0260aebeba55", "label":"blah6", "size":.083333, "color":.98, "children":[
-                        {"id":"4511fee8-ae17-4df1-b84b-a3e1a66ea470", "label":"blah61", "size":.25, "color":.19},
-                        {"id":"ab206acd-b0f7-4789-9f17-35b54ce119d9", "label":"blah62", "size":.25, "color":.74},
-                        {"id":"d436ff53-076d-4b8a-86cc-c102ebf58a3f", "label":"blah63", "size":.16667, "color":.29},
-                        {"id":"25a300d6-c361-43ec-b9e1-bad3399383b8", "label":"blah64", "size":.125, "color":.52},
-                        {"id":"391c72a8-1db8-4d7c-a84f-51200d092159", "label":"blah65", "size":.083333, "color":.74},
-                        {"id":"7071d634-c233-45a2-a169-f0fbe2403292", "label":"blah66", "size":.083333, "color":.39},
-                        {"id":"939985e5-1872-4ec4-90d7-1b3c5ab62a2f", "label":"blah67", "size":.041666667, "color":.63}
-                    ]},
-                    {"id":"08095bd4-0942-470c-92fc-eb042d9f14f3", "label":"blah7", "size":.041666667, "color":.85, "children":[
-                        {"id":"0e27d9c9-4b20-44ec-b22b-d19947d1d8c4", "label":"blah71", "size":.25, "color":.39},
-                        {"id":"2fa79804-ac2c-47c6-a370-80790742f3d7", "label":"blah72", "size":.25, "color":.52},
-                        {"id":"e3ede063-f42b-4573-af6b-c0a3f9281483", "label":"blah73", "size":.16667, "color":.74},
-                        {"id":"40e92699-fae5-4703-9520-fe5f5fa56ef6", "label":"blah74", "size":.125, "color":.85},
-                        {"id":"9296b705-2bd0-4c77-a5f2-2cbe775fa84a", "label":"blah75", "size":.083333, "color":.98},
-                        {"id":"432db33d-f5a3-4acd-a5ef-739b0de091c0", "label":"blah76", "size":.083333, "color":.74},
-                        {"id":"4a01b07c-fa6b-4ce6-a12a-2c28c5310475", "label":"blah77", "size":.041666667, "color":.52}
-                    ]},
-                ]},
-            ]
+            nodeData: []
         },  
 
         // Set up the widget
         _create: function() {
-            $(window).resize(function(){  
-            });  
+            //this._refresh();
         },
 
         _init: function() {
@@ -281,6 +210,17 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
+                case "colorOption":
+                    this.options.colorOption = value;
+                    this._refreshColorGradient();
+                    this._renderNodes();
+                    this._renderNodeLabels();
+                    this._trigger("refresh",null,this.element);
+                    break;
+                case "sizeOption":
+                    this.options.sizeOption = value;
+                    this._refresh();
+                    break;
                 case "nodeData":
                     this.options.nodeData = value;
                     this._refresh();
@@ -308,7 +248,8 @@
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     var rect = nodes[i].geometry;
-                    var rgb = that._getRgbColor(nodes[i].color);
+                    if (rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area
+                    var rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                     nodes[i].computedColor = rgb;
                     ctx.save();
                     if ( nodes[i].hasOwnProperty('children')) { // group node
@@ -355,9 +296,10 @@
         _renderNodeLabels: function() {
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
-                    if (that.options.nodeData[0] !== nodes[i]){ // skip root node
+                    if (that._isRootNode(nodes[i]) == false) { // skip root node
                         //console.log(nodes[i].label);
                         var rect = nodes[i].geometry;
+                        if (rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area
                         var rgb = nodes[i].computedColor;
                         var text = nodes[i].label;
                         ctx.save();
@@ -473,9 +415,16 @@
 
         _refreshLayout: function(layoutMethod) {
             function _processNodes(rect,nodes,area,layoutMethod,header) {
+                nodes.sort(function(x,y){
+                    if (x.size[that.options.sizeOption] > y.size[that.options.sizeOption])
+                        return -1;
+                    if (x.size[that.options.sizeOption] < y.size[that.options.sizeOption])
+                        return 1;
+                    return 0;
+                });
                 var a = [];
                 for (var i = 0; i < nodes.length; i++) {
-                    a[i]=nodes[i].size*area;
+                    a[i]=nodes[i].size[that.options.sizeOption]*area;
                 }
                 var b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 nodeCnt += b.length;
@@ -486,7 +435,7 @@
                 for (var i = 0; i < nodes.length; i++) {
                     if (nodes[i].hasOwnProperty('children')) {
                         rect = nodes[i].geometry;
-                        if (that.options.nodeData[0] !== nodes[i] && (rect[3]-header>0)) { // skips root node
+                        if (that._isRootNode(nodes[i]) == false && (rect[3]-header>0)) { // skips root node
                             rect = [rect[0],rect[1]+header,rect[2],rect[3]-header];
                         }
                         area = rect[2]*rect[3];
@@ -531,6 +480,7 @@
         },
 
         _coordsToId: function(x, y) {
+            if (this.scanLines === undefined) return [];
             var runlengths = this.scanLines[y];
             var ids = new Array();
             if (runlengths) {
@@ -565,6 +515,12 @@
 
         _getNode: function(id){
             return this.nodeList[id];
+        },
+
+        _isRootNode: function(node) {
+            if (this.options.nodeData[0] === node)
+                return true;
+            return false;
         },
 
         // Use the destroy method to clean up any modifications your widget has made to the DOM
