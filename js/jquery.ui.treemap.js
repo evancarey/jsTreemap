@@ -15,15 +15,16 @@
         options: {
             // in future get dimensions from containing element maybe?
             dimensions: [600,400],
-            // For initial dev, color gradient is hard coded here.  
-            colorGradient: { 
+            // default color gradient
+            colorGradients: [{ 
                 resolution: 1024,
                 colorStops : [
-                    {"val":0,"color":"#770"},
-                    {"val":0.5,"color":"#fff"},
-                    {"val":1,"color":"#077"}
+                    {"val":0,"color":"#08f"},
+                    {"val":0.5,"color":"#03f"},
+                    {"val":1,"color":"#005"}
                 ]
-            },
+            }],
+            naColors: ["#000"],
             groupHeader: {
                 height: 12,
                 colorStops : [
@@ -34,20 +35,18 @@
                 ]
             },
             nodeGradient: function(ctx,rect,rgb) {
-                //console.log("rect="+rect);
                 var r1 = Math.min(rect[2],rect[3])*0.1;
                 var r2 = Math.max(rect[2],rect[3]);
                 var x = rect[0]+rect[2]*0.5;
                 var y = rect[1]+rect[3]*0.5;
-                //console.log("x="+x+";y="+y);
                 var gradient = ctx.createRadialGradient(x,y,r1,x,y,r2);
                 gradient.addColorStop(0,TreemapUtils.lighterColor(TreemapUtils.rgb2hex(rgb),0.2));
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
-            sizeOption: 0,
-            colorOption: 0,
-            nodeBorderWidth: 0,
+            sizeOption: 0, // index into size attribute of this.options.nodeData elements
+            colorOption: 0, // index into this.options.colorGradients array of color gradient definitions
+            nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
             nodeData: []
         },  
 
@@ -203,8 +202,8 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
-                case "colorGradient":
-                    this.options.colorGradient = value;
+                case "colorGradients": // TODO: check for argument to test for update to one color gradient
+                    this.options.colorGradients = value;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
@@ -247,36 +246,35 @@
             };
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
-                    var rect = nodes[i].geometry;
-                    if (rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area
-                    var rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
-                    nodes[i].computedColor = rgb;
-                    ctx.save();
-                    if ( nodes[i].hasOwnProperty('children')) { // group node
-                        ctx.fillStyle = headerGradient(ctx,rect,that.options.groupHeader);
-                    } else { // leaf node
-                        ctx.fillStyle = that.options.nodeGradient.call(that,ctx,rect,rgb);
+                    if (that._isRootNode(nodes[i]) == false) { // skip root node
+                        var rect = nodes[i].geometry;
+                        if (isNaN(rect[0]) || isNaN(rect[1]) || isNaN(rect[2]) || isNaN(rect[3]) || rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        var rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
+                        nodes[i].computedColor = rgb;
+                        ctx.save();
+                        if ( nodes[i].hasOwnProperty('children')) { // group node
+                            if(that.options.dimensions[0] > rect[0]+rect[2]) rect[2] -= that.options.nodeBorderWidth;
+                            if(that.options.dimensions[1] > rect[1]+rect[3]) rect[3] -= that.options.nodeBorderWidth;
+                            ctx.fillStyle = headerGradient(ctx,rect,that.options.groupHeader);
+                        } else { // leaf node
+                            ctx.fillStyle = that.options.nodeGradient.call(that,ctx,rect,rgb);
+                        }
+                        ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
+                        if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
+                            ctx.strokeStyle = "#000";
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(rect[0]+rect[2],rect[1]);
+                            ctx.lineTo(rect[0]+rect[2],rect[1]+that.options.groupHeader.height);
+                            ctx.closePath();
+                            ctx.stroke();
+                        }
+                        ctx.restore();
+                        for (var j = 0; j < rect[3]; j++) {
+                            that._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),nodes[i].id);
+                        }
+                        nodeCnt++;
                     }
-                    ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
-                    if ( nodes[i].hasOwnProperty('children')) {
-                        ctx.strokeStyle = "#000";
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(rect[0],rect[1]);
-                        ctx.lineTo(rect[0],rect[1]+that.options.groupHeader.height);
-                        ctx.closePath();
-                        ctx.stroke();
-                        ctx.beginPath();
-                        ctx.moveTo(rect[0]+rect[2],rect[1]);
-                        ctx.lineTo(rect[0]+rect[2],rect[1]+that.options.groupHeader.height);
-                        ctx.closePath();
-                        ctx.stroke();
-                    }
-                    ctx.restore();
-                    for (var j = 0; j < rect[3]; j++) {
-                        that._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),nodes[i].id);
-                    }
-                    nodeCnt++;
                     if (nodes[i].hasOwnProperty('children')) {
                         processNodes(nodes[i].children);
                     }
@@ -299,7 +297,7 @@
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
                         //console.log(nodes[i].label);
                         var rect = nodes[i].geometry;
-                        if (rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area
+                        if (isNaN(rect[0]) || isNaN(rect[1]) || isNaN(rect[2]) || isNaN(rect[3]) || rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         var rgb = nodes[i].computedColor;
                         var text = nodes[i].label;
                         ctx.save();
@@ -309,7 +307,7 @@
                         if ( nodes[i].hasOwnProperty('children')) {
                             // Group Node
                             ctx.fillStyle = '#555'; // TODO: make an option value
-                            ctx.font = 'italic 0.625em sans-serif'; // TODO: make option value
+                            ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
                             ctx.fillText(text,rect[0],rect[1]+10);
                         } else {
                             // Leaf Node
@@ -330,7 +328,7 @@
                             ctx.fillText(text,rect[0],rect[1]+ptSize);
                             */
                             // TODO: only render text that fits node
-                            ctx.font = 'italic 0.625em sans-serif';
+                            ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
                             ctx.fillText(text,rect[0],rect[1]+10);
                         }
                         ctx.restore();
@@ -400,21 +398,22 @@
 
         _refreshColorGradient: function() {
             var canvas = document.createElement("canvas");
-            canvas.setAttribute("width",this.options.colorGradient.resolution);
+            var colorGradient = this.options.colorGradients[this.options.colorOption];
+            canvas.setAttribute("width",colorGradient.resolution);
             canvas.setAttribute("height",1);
             if (typeof(G_vmlCanvasManager) != 'undefined') G_vmlCanvasManager.initElement(canvas);
             var ctx = canvas.getContext("2d");
-            var gradient1 = ctx.createLinearGradient(0, 0, this.options.colorGradient.resolution, 0);
-            for (var i = 0; i < this.options.colorGradient.colorStops.length; i += 1) {
-                gradient1.addColorStop(this.options.colorGradient.colorStops[i].val,this.options.colorGradient.colorStops[i].color);
+            var gradient1 = ctx.createLinearGradient(0, 0, colorGradient.resolution, 0);
+            for (var i = 0; i < colorGradient.colorStops.length; i += 1) {
+                gradient1.addColorStop(colorGradient.colorStops[i].val,colorGradient.colorStops[i].color);
             }
             ctx.fillStyle=gradient1;
-            ctx.fillRect(0,0,this.options.colorGradient.resolution,1);
-            this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorGradient.resolution,1);
+            ctx.fillRect(0,0,colorGradient.resolution,1);
+            this.options.colorGradientMap = ctx.getImageData(0,0,colorGradient.resolution,1);
         },
 
         _refreshLayout: function(layoutMethod) {
-            function _processNodes(rect,nodes,area,layoutMethod,header) {
+            function _processNodes(rect,nodes,area,layoutMethod) {
                 nodes.sort(function(x,y){
                     if (x.size[that.options.sizeOption] > y.size[that.options.sizeOption])
                         return -1;
@@ -435,27 +434,35 @@
                 for (var i = 0; i < nodes.length; i++) {
                     if (nodes[i].hasOwnProperty('children')) {
                         rect = nodes[i].geometry;
-                        if (that._isRootNode(nodes[i]) == false && (rect[3]-header>0)) { // skips root node
-                            rect = [rect[0],rect[1]+header,rect[2],rect[3]-header];
+                        // adjust rect according to header height
+                        if (that._isRootNode(nodes[i]) == false && (rect[3]-that.options.groupHeader.height>0)) { // skips root node
+                            rect = [rect[0],rect[1]+that.options.groupHeader.height,rect[2],rect[3]-that.options.groupHeader.height];
+                        }
+                        // adjust rect according to border width
+                        if (that._isRootNode(nodes[i]) == false && (rect[3]-that.options.nodeBorderWidth>0)) { // skips root node
+                            //rect = [rect[0],rect[1],rect[2]-that.options.nodeBorderWidth,rect[3]-that.options.nodeBorderWidth];
+                            if(that.options.dimensions[0] > rect[0]+rect[2]) rect[2] -= that.options.nodeBorderWidth;
+                            if(that.options.dimensions[1] > rect[1]+rect[3]) rect[3] -= that.options.nodeBorderWidth;
                         }
                         area = rect[2]*rect[3];
-                        _processNodes(rect,nodes[i].children,area,layoutMethod,header);
+                        _processNodes(rect,nodes[i].children,area,layoutMethod);
                     }
                 }
             };
             var t0 = new Date();
             var that = this;
             var nodeCnt = 0;
-            var header = that.options.groupHeader.height;
             var area = that.options.dimensions[0] * that.options.dimensions[1];
             var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
             that._clearNodeList();
-            _processNodes(rect,that.options.nodeData,area,layoutMethod,header);
+            _processNodes(rect,that.options.nodeData,area,layoutMethod);
             var t1 = new Date();
             console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
 
         _getRgbColor: function(val) {
+            //console.log(val);
+            if (val == null) return TreemapUtils.hex2rgb(this.options.naColors[this.options.colorOption]);
             var map = this.options.colorGradientMap.data;
             var i = Math.floor(val*(map.length/4))*4;
             return [map[i],map[i+1],map[i+2]];
@@ -651,6 +658,18 @@ TreemapUtils.rgb2hex = function(rgb) {
 
 TreemapUtils.avgRgb = function(rgb) {
     return Math.floor(TreemapUtils.sumArray(rgb)/3);
+};
+
+TreemapUtils.hex2rgb = function(color) {
+    // Convert hex to decimal
+    return color.replace(
+        /^#?([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])/i,
+        function() {
+            return parseInt(arguments[1], 16) + ',' +
+                parseInt(arguments[2], 16) + ',' +
+                parseInt(arguments[3], 16);
+        }
+    ).split(/,/); // return array
 };
 
 //
