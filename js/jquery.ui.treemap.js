@@ -44,6 +44,7 @@
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
+            labelOption: 0, // index into label attribute of this.options.nodeData elements
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
             colorOption: 0, // index into this.options.colorGradients array of color gradient definitions
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
@@ -303,11 +304,11 @@
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
-                        //console.log(nodes[i].label);
+                        //console.log(nodes[i].label[that.options.labelOption]);
                         var rect = nodes[i].geometry;
                         if (isNaN(rect[0]) || isNaN(rect[1]) || isNaN(rect[2]) || isNaN(rect[3]) || rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         var rgb = nodes[i].computedColor;
-                        var text = nodes[i].label;
+                        var text = nodes[i].label[that.options.labelOption];
                         ctx.save();
                         ctx.beginPath();
                         ctx.rect(rect[0],rect[1],rect[2],rect[3]);
