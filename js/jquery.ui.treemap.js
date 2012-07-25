@@ -47,6 +47,7 @@
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
             colorOption: 0, // index into this.options.colorGradients array of color gradient definitions
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
+            enableLabels: true,
             nodeData: []
         },  
 
@@ -196,6 +197,12 @@
                     this.options.dimensions = value;
                     this._refresh();
                     break;
+                case "enableLabels":
+                    this.options.enableLabels = value;
+                    this._renderNodes();
+                    this._renderNodeLabels();
+                    this._trigger("refresh",null,this.element);
+                    break;
                 case "nodeGradient":
                     this.options.nodeGradient = value;
                     this._renderNodes();
@@ -292,6 +299,7 @@
         },
 
         _renderNodeLabels: function() {
+            if (this.options.enableLabels != true) return;
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node

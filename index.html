@@ -37,7 +37,6 @@
                     <p>Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout described in <a href="http://www.win.tue.nl/~vanwijk/stm.pdf">"Squarified Treemaps"</a> by Mark Bruls, Kees Huizing and Jarke J. van Wijk.  Alternate layout algorithms could easily be added to the widget and made selectable.</p>
                     <p>Development and testing has primarily been limited to current versions of Chrome and FF.  I rarely test (and fix for) IE.</p>
                     <p>The following example demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create the treemap, then click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient used to render the treemap leaf nodes.</p>
-                    <input id="t1" type="button" value="create"/>
                     <input id="t2" type="button" value="800x200"/>
                     <input id="t3" type="button" value="600x400"/>
                     <input id="t4" type="button" value="color1"/>
@@ -45,16 +44,19 @@
                     <input id="t6" type="button" value="gradient1"/>
                     <input id="t7" type="button" value="gradient2"/>
                     <input id="t8" type="button" value="destroy"/>
+                    <input id="t1" type="button" value="create"/>
+                    <input id="t9" type="checkbox" checked="checked"/>
+                    <label for="t9">labels</label>
                     <div><span id="treemap"></span></div>
                     <div id="debug-info"><span><p>Click the 'create' button to create example treemap</p></span></div>
                     <div id="highlighter"></div>
                     <div id="mouseoverbox" class="mouseoverbox"></div>
                     
                     <h4>Events</h4>
-                    <p><b>treemapmousemove</b> event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The rendering of the mouseover box and node highlighter(s) are not part of the treemap plugin.  The mouseover box and highlighter(s) are optional presentation elements and can be populated, styled and made dynamic using HTML, CSS and Javascript.  This sample code demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details of the treemap.</p>
-                    <p><b>treemapmouseclick</b> event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  This sample code demonstrates what information is available to the event handler.</p>
+                    <p><b>treemapmousemove</b> event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
+                    <p><b>treemapmouseclick</b> event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
                 </div>
-                <div><p>The jQuery treemap widget code and this HTML, CSS, Javascript demo is available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
+                <div><p>The jQuery treemap widget code and this page's HTML, CSS and Javascript is available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
             </div>
             <div id="footer">
             </div>
@@ -126,15 +128,15 @@
             var updateMouseoverbox = function(e,data) {
                 $(".mouseoverbox").hide();
                 if (data.nodes[0].hasOwnProperty('children') === false) {
-                    $("#mouseoverbox").css({"background-color":"rgba(255,255,255,0.8)"});
+                    $("#mouseoverbox").css({"background-color":"rgba(255,255,255,0.85)"});
                 } else {
-                    $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.8)"});
+                    $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.85)"});
                 }
                 $("#mouseoverbox").html("<span>"
-                    + "<p>" + data.nodes[0].label 
-                    + "</p><p>x = " + blah[data.nodes[0].id].x + "</p>"
-                    + "</p><p>y = " + blah[data.nodes[0].id].y + "</p>"
-                    + "</p><p>z = " + blah[data.nodes[0].id].z + "</p>"
+                    + "<p><b>" + data.nodes[0].label + "</b></p>"
+                    + "<p>x = <b>" + blah[data.nodes[0].id].x + "</b></p>"
+                    + "<p>y = <b>" + blah[data.nodes[0].id].y + "</b></p>"
+                    + "<p>z = <b>" + blah[data.nodes[0].id].z + "</b></p>"
                     + "</span>");
                 var mouseoverboxWidth = $("#mouseoverbox").width();
                 var mouseoverboxHeight = $("#mouseoverbox").height();
@@ -156,21 +158,10 @@
                 $("#mouseoverbox").show();
             };
             var init = function(){
-                $("#treemap-ex1").treemap({
-                    "dimensions":[900,300],
-                    "nodeData":[
-                        {"id":"23f627dc-6078-403e-96d3-c05aabf9f2c9", "label":"blah1", "size":[1.0], "color":[.39], "children":[
-                            {"id":"ce96d31f-24fa-4258-bd25-c94191096c86", "label":"blah11", "size":[.25], "color":[.74]},
-                            {"id":"91e0ea1d-47e9-4520-b991-2fdb7d73caf1", "label":"blah12", "size":[.25], "color":[.98]},
-                            {"id":"62188591-f1b2-42df-a6aa-6831a8c53352", "label":"blah13", "size":[.16667], "color":[.39]},
-                            {"id":"b80861a4-cdad-49fa-b6f3-aa8508f2bf7d", "label":"blah14", "size":[.125], "color":[.19]},
-                            {"id":"9216f340-4949-472b-8246-b25a71dd9916", "label":"blah15", "size":[.083333], "color":[.52]},
-                            {"id":"40236148-e7b4-4a0d-ba33-463b814ba736", "label":"blah16", "size":[.083333], "color":[.98]},
-                            {"id":"c12264b7-e79e-444d-b357-6b002f0ada65", "label":"blah17", "size":[.041666667], "color":[.74]}
-                        ]}
-                    ],
-                });
-                $("#t1").click(function(){
+                var treemapActive = false;
+                var createTreemap = function() {
+                    if (treemapActive == true) return;
+                    treemapActive = true;
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap({
                         "dimensions":[900,300],
@@ -254,6 +245,9 @@
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler)
                     .mouseleave(function(){mouseleaveHandler()});
+                };
+                $("#t1").click(function(){
+                    createTreemap();
                 });
                 $("#t2").click(function(){
                     $(".highlighter").hide();
@@ -321,10 +315,15 @@
                     $(".highlighter").hide().unbind();
                     $("#treemap").unbind().treemap("destroy");
                     $("#debug-info").html("<span><p>click the 'create' button to create treemap</p></span>");
+                    treemapActive = false;
                 });
+                $("#t9").click(function(){
+                    $("#treemap").treemap("option","enableLabels",$(this).is(':checked'));
+                });
+                createTreemap();   
             };
             $(document).ready(function(){
-                        init();
+                init();
             });
         </script>
     </body>
