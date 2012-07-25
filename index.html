@@ -162,6 +162,7 @@
                 var createTreemap = function() {
                     if (treemapActive == true) return;
                     treemapActive = true;
+                    $("#t9").attr('checked','checked');
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap({
                         "dimensions":[900,300],
