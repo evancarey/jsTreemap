@@ -16,15 +16,15 @@
             // in future get dimensions from containing element maybe?
             dimensions: [600,400],
             // default color gradient
-            colorGradients: [{ 
-                resolution: 1024,
+            colorGradient: { 
                 colorStops : [
                     {"val":0,"color":"#08f"},
                     {"val":0.5,"color":"#03f"},
                     {"val":1,"color":"#005"}
                 ]
-            }],
-            naColors: ["#000"],
+            },
+            colorResolution: 1024,
+            naColor: "#000",
             groupHeader: {
                 height: 12,
                 colorStops : [
@@ -210,8 +210,8 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
-                case "colorGradients": // TODO: check for argument to test for update to one color gradient
-                    this.options.colorGradients = value;
+                case "colorGradient":
+                    this.options.colorGradient = value;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
@@ -407,18 +407,18 @@
 
         _refreshColorGradient: function() {
             var canvas = document.createElement("canvas");
-            var colorGradient = this.options.colorGradients[this.options.colorOption];
-            canvas.setAttribute("width",colorGradient.resolution);
+            var colorGradient = this.options.colorGradient;
+            canvas.setAttribute("width",this.options.colorResolution);
             canvas.setAttribute("height",1);
             if (typeof(G_vmlCanvasManager) != 'undefined') G_vmlCanvasManager.initElement(canvas);
             var ctx = canvas.getContext("2d");
-            var gradient1 = ctx.createLinearGradient(0, 0, colorGradient.resolution, 0);
+            var gradient1 = ctx.createLinearGradient(0, 0, this.options.colorResolution, 0);
             for (var i = 0; i < colorGradient.colorStops.length; i += 1) {
                 gradient1.addColorStop(colorGradient.colorStops[i].val,colorGradient.colorStops[i].color);
             }
             ctx.fillStyle=gradient1;
-            ctx.fillRect(0,0,colorGradient.resolution,1);
-            this.options.colorGradientMap = ctx.getImageData(0,0,colorGradient.resolution,1);
+            ctx.fillRect(0,0,this.options.colorResolution,1);
+            this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorResolution,1);
         },
 
         _refreshLayout: function(layoutMethod) {
@@ -471,7 +471,7 @@
 
         _getRgbColor: function(val) {
             //console.log(val);
-            if (val == null) return TreemapUtils.hex2rgb(this.options.naColors[this.options.colorOption]);
+            if (val == null) return TreemapUtils.hex2rgb(this.options.naColor);
             var map = this.options.colorGradientMap.data;
             var i = Math.floor(val*(map.length/4))*4;
             return [map[i],map[i+1],map[i+2]];

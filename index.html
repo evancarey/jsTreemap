@@ -266,8 +266,7 @@
                     .mouseleave(function(){mouseleaveHandler()});
                 });
                 $("#t5").click(function(){
-                    $("#treemap").treemap("option","colorGradients",[{
-                        resolution:1024,
+                    $("#treemap").treemap("option","colorGradient",{
                         colorStops:[
                             {"val":0,  "color":"#a00"},
                             {"val":.4,"color":"#f00"},
@@ -275,11 +274,10 @@
                             {"val":.6,"color":"#0f0"},
                             {"val":1,  "color":"#070"}
                         ]
-                    }]);
+                    });
                 });
                 $("#t4").click(function(){
-                    $("#treemap").treemap("option","colorGradients",[{
-                        resolution:1024,
+                    $("#treemap").treemap("option","colorGradient",{
                         colorStops:[
                             {"val":0,"color":"#520"},
                             {"val":.25,"color":"#ff0"},
@@ -287,7 +285,7 @@
                             {"val":0.75,"color":"#0ff"},
                             {"val":1,"color":"#052"}
                         ]
-                    }]);
+                    });
                 });
                 $("#t6").click(function(){
                     $("#treemap").treemap("option","nodeGradient",function(ctx,rect,rgb){
