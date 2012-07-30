@@ -224,6 +224,14 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
+                case "colorOptionAndGradient":
+                    this.options.colorOption = value.colorOption;
+                    this.options.colorGradient = value.colorGradient;
+                    this._refreshColorGradient();
+                    this._renderNodes();
+                    this._renderNodeLabels();
+                    this._trigger("refresh",null,this.element);
+                    break;
                 case "sizeOption":
                     this.options.sizeOption = value;
                     this._refresh();
@@ -480,6 +488,7 @@
         _clearScanLines: function() {
             if (this.scanLines) {
                 this.scanLines.length = 0;
+                this.scanLines = [];
             }
         },
 
@@ -517,6 +526,7 @@
         _clearNodeList: function() {
             if (this.nodeList) {
                 this.nodeList.length = 0;
+                this.nodeList = [];
             }
         },
 
