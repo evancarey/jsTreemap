@@ -49,7 +49,7 @@
             colorOption: 0, // index into this.options.colorGradients array of color gradient definitions
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
             enableLabels: true,
-            nodeData: []
+            nodeData: {}
         },  
 
         // Set up the widget
@@ -302,7 +302,7 @@
             var ctx = canvas.getContext("2d");
             var nodeCnt = 0;
             that._clearScanLines();
-            processNodes(that.options.nodeData);
+            processNodes([that.options.nodeData]);
             var t1 = new Date();
             console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
@@ -362,7 +362,7 @@
             var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
             var nodeCnt = 0;
-            processNodes(that.options.nodeData);
+            processNodes([that.options.nodeData]);
             var t1 = new Date();
             console.log("Render Node Labels: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
@@ -430,7 +430,7 @@
         },
 
         _refreshLayout: function(layoutMethod) {
-            function _processNodes(rect,nodes,area,layoutMethod) {
+            function processNodes(rect,nodes,area,layoutMethod) {
                 nodes.sort(function(x,y){
                     if (x.size[that.options.sizeOption] > y.size[that.options.sizeOption])
                         return -1;
@@ -462,7 +462,7 @@
                             if(that.options.dimensions[1] > rect[1]+rect[3]) rect[3] -= that.options.nodeBorderWidth;
                         }
                         area = rect[2]*rect[3];
-                        _processNodes(rect,nodes[i].children,area,layoutMethod);
+                        processNodes(rect,nodes[i].children,area,layoutMethod);
                     }
                 }
             };
@@ -472,7 +472,7 @@
             var area = that.options.dimensions[0] * that.options.dimensions[1];
             var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
             that._clearNodeList();
-            _processNodes(rect,that.options.nodeData,area,layoutMethod);
+            processNodes(rect,[that.options.nodeData],area,layoutMethod);
             var t1 = new Date();
             console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
         },
@@ -544,7 +544,7 @@
         },
 
         _isRootNode: function(node) {
-            if (this.options.nodeData[0] === node)
+            if (this.options.nodeData === node)
                 return true;
             return false;
         },

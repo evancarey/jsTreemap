@@ -25,6 +25,9 @@
                 font-size: 0.625em;
                 color: #444;
             }
+            .codeDiv {
+                border: 1px solid #aaa;
+            }
         </style>
     </head>
     <body>
@@ -52,10 +55,138 @@
                     <div id="debug-info"><span><p>Click the 'create' button to create example treemap</p></span></div>
                     <div id="highlighter"></div>
                     <div id="mouseoverbox" class="mouseoverbox"></div>
-                
+                    <h4>Options</h4>
+                        <h5>dimensions</h5>
+                        <p>An array of two elements the first being the width and the second is the height (in pixels) of the canvas element used to render the treemap.  Example: set the width to 600 pixels and height to 400 pixels.</p>
+    <div class="codeDiv"><pre>
+    dimensions: [600,400]</pre></div>
+                        <h5>nodeData</h5>
+                        <p>A data structure containing the nodes to be presented in the treemap.  Each node has the members: "id", "label", "size", and "color".  Internal nodes have the additional member "children".  
+                        <ul>
+                            <li>"id" is a unique identifier for the node.</li>
+                            <li>"label" is an array of strings that can be used as a node's label.  The element used to label the map depends on the value of the option "labelOption".</li>
+                            <li>"size" is an array of float values that can be used to size a node.  Size values are relative values that represent what fraction of the parent's area the child node should occupy.  The element used to size the node is dependent on the value of the option "sizeOption".</li>
+                            <li>"color" is an array of float values that are used to compute an index into the treemap's color gradient.  The element used to color the node is dependent on the value of the option "colorOption".</li>
+                            <li>"children" is an array of child nodes.</li>
+                        </ul>
+                        Example:
+                        </p>
+    <div class="codeDiv"><pre>
+    nodeData: {
+        "id":"2fc414e2", 
+        "label":["root"], 
+        "size":[1.0], 
+        "color":[1.0], 
+        "children":[
+            {
+                "id":"23f627dc", 
+                "label":["blah1"], 
+                "size":[.25], 
+                "color":[.39], 
+                "children":[
+                    {
+                        "id":"ce96d31f", 
+                        "label":["blah11"], 
+                        "size":[.25], 
+                        "color":[.74]
+                    },
+                    {
+                        "id":"91e0ea1d", 
+                        "label":["blah12"], 
+                        "size":[.25], 
+                        "color":[.98]
+                    },
+                    {
+                        "id":"62188591", 
+                        "label":["blah13"], 
+                        "size":[.16667], 
+                        "color":[.39]
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
+    }</pre></div>
+                        <h5>labelOption</h5>
+                        <p>An index into a node's label array used to specify which label string to apply to the node.</p>
+    <div class="codeDiv"><pre>
+    labelOption: 0</pre></div>
+                        <h5>sizeOption</h5>
+                        <p>An index into a node's size array used to specify which size value to apply to the node.</p>
+    <div class="codeDiv"><pre>
+    sizeOption: 0</pre></div>
+                        <h5>colorOption</h5>
+                        <p>An index into a node's color array used to specify which color value to apply to the node.</p>
+    <div class="codeDiv"><pre>
+    colorOption: 0</pre></div>
+                        <h5>colorGradient</h5>
+                        <p>An object containing the member "colorStops" which is an array of colors and values used to create the treemap's linear color gradient.</p>
+    <div class="codeDiv"><pre>
+    colorGradient: { 
+        colorStops : [
+            {"val":0,"color":"#08f"},
+            {"val":0.5,"color":"#03f"},
+            {"val":1,"color":"#005"}
+        ]
+    }</pre></div>
+                        <h5>colorResolution</h5>
+                        <p>An integer value which is used as the length of the treemap's linear color gradient.</p>
+    <div class="codeDiv"><pre>
+    colorResolution: 1024</pre></div>
+                        <h5>naColor</h5>
+                        <p>A hex color value used for nodes with null values for the current colorOption.</p>
+    <div class="codeDiv"><pre>
+    naColor: "#000"</pre></div>
+                        <h5>groupHeader</h5>
+                        <p>An object with "height" and "colorStops" members.
+                        <ul>
+                            <li>"height" is the height of an internal nodes heading.</li>
+                            <li>"colorStops" is an array of colors and values used to create the linear gradient applied to the internal node's header.</li>
+                        </ul>
+                        </p>
+    <div class="codeDiv"><pre>
+    groupHeader: {
+        height: 12,
+        colorStops : [
+            {"val":0, "color":"#ccc"},
+            {"val":.4, "color":"#fff"},
+            {"val":.6, "color":"#fff"},
+            {"val":1, "color":"#777"}
+        ]
+    }</pre></div>
+                        <h5>nodeGradient</h5>
+                        <p>A function that returns a gradient object used as the fillStyle of leaf nodes.  The function takes 3 arguments: "ctx", "rect" and "rgb".
+                        <ul>
+                            <li>"ctx" is the 2d drawing context of the treemap's canvas element.</li>
+                            <li>"rect" is a node's rectangle generated by treemap layout algorithm.</li>
+                            <li>"rgb" is a node's color value obtained by treemap's lookup into its current color gradient.</li>
+                        </ul>
+                        </p>
+    <div class="codeDiv"><pre>
+    nodeGradient: function(ctx,rect,rgb) {
+        var r1 = Math.min(rect[2],rect[3])*0.1;
+        var r2 = Math.max(rect[2],rect[3]);
+        var x = rect[0]+rect[2]*0.5;
+        var y = rect[1]+rect[3]*0.5;
+        var gradient = ctx.createRadialGradient(x,y,r1,x,y,r2);
+        gradient.addColorStop(0,TreemapUtils.lighterColor(TreemapUtils.rgb2hex(rgb),0.2));
+        gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
+        return gradient;
+    }</pre></div>
+                        <h5>nodeBorderWidth</h5>
+                        <p>Number of pixels to use as spacing around internal nodes.</p>
+    <div class="codeDiv"><pre>
+    nodeBorderWidth: 0</pre></div>
+                        <h5>enableLabels</h5>
+                        <p>Boolean used to enable or disable node labelling.</p>
+    <div class="codeDiv"><pre>
+    enableLabels: true</pre></div>
                     <h4>Events</h4>
-                    <p><b>treemapmousemove</b> event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
-                    <p><b>treemapmouseclick</b> event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
+                    <h5>treemapmousemove</h5>
+                    <p>The <b>treemapmousemove</b> event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
+                    <h5>treemapmouseclick</h5>
+                    <p>The <b>treemapmouseclick</b> event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
                 </div>
                 <div><p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
             </div>
@@ -167,8 +298,8 @@
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap({
                         "dimensions":[900,300],
-                        "nodeData":[
-                            {"id":"2fc414e2", "label":["root"], "size":[1.0], "color":[1.0], "children":[
+                        "nodeData": {
+                            "id":"2fc414e2", "label":["root"], "size":[1.0], "color":[1.0], "children":[
                                 {"id":"23f627dc", "label":["blah1"], "size":[.25], "color":[.39], "children":[
                                     {"id":"ce96d31f", "label":["blah11"], "size":[.25], "color":[.74]},
                                     {"id":"91e0ea1d", "label":["blah12"], "size":[.25], "color":[.98]},
@@ -241,7 +372,7 @@
                                     {"id":"4a01b07c", "label":["blah77"], "size":[.041666667], "color":[.52]}
                                 ]},
                             ]
-                        }]
+                        }
                     })
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler)
