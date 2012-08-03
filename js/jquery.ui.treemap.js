@@ -263,31 +263,37 @@
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
-                        var rect = nodes[i].geometry;
-                        if (isNaN(rect[0]) || isNaN(rect[1]) || isNaN(rect[2]) || isNaN(rect[3]) || rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        var bodyRect = nodes[i].geometry.body;
+                        var headerRect = nodes[i].geometry.header;
+                        var nodeRect = bodyRect.slice();
+                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] == 0. || bodyRect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         var rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                         nodes[i].computedColor = rgb;
                         ctx.save();
-                        if ( nodes[i].hasOwnProperty('children')) { // group node
-                            if(that.options.dimensions[0] > rect[0]+rect[2]) rect[2] -= that.options.nodeBorderWidth;
-                            if(that.options.dimensions[1] > rect[1]+rect[3]) rect[3] -= that.options.nodeBorderWidth;
-                            ctx.fillStyle = headerGradient(ctx,rect,that.options.groupHeader);
+                        if ( nodes[i].hasOwnProperty('children') && headerRect != null) { // group node
+                            ctx.fillStyle = headerGradient(ctx,headerRect,that.options.groupHeader);
+                            ctx.fillRect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
+                            if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
+                                ctx.strokeStyle = "#000";
+                                ctx.lineWidth = 0.5;
+                                ctx.beginPath();
+                                ctx.moveTo(headerRect[0]+headerRect[2],headerRect[1]);
+                                ctx.lineTo(headerRect[0]+headerRect[2],headerRect[1]+headerRect[3]);
+                                ctx.closePath();
+                                ctx.stroke();
+                            }
+                            // Adjust node rectangle with header geometry
+                            nodeRect[0] = headerRect[0];
+                            nodeRect[1] = headerRect[1];
+                            nodeRect[3] = headerRect[3] + bodyRect[3];
                         } else { // leaf node
-                            ctx.fillStyle = that.options.nodeGradient.call(that,ctx,rect,rgb);
-                        }
-                        ctx.fillRect(rect[0],rect[1],rect[2],rect[3]);
-                        if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
-                            ctx.strokeStyle = "#000";
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath();
-                            ctx.moveTo(rect[0]+rect[2],rect[1]);
-                            ctx.lineTo(rect[0]+rect[2],rect[1]+that.options.groupHeader.height);
-                            ctx.closePath();
-                            ctx.stroke();
+                            ctx.fillStyle = that.options.nodeGradient.call(that,ctx,bodyRect,rgb);
+                            ctx.fillRect(bodyRect[0],bodyRect[1],bodyRect[2],bodyRect[3]);
                         }
                         ctx.restore();
-                        for (var j = 0; j < rect[3]; j++) {
-                            that._addRunlength(rect[0],rect[0]+rect[2],(rect[1]+j),nodes[i].id);
+                        // Add node geometry to scanline map
+                        for (var j = 0; j < nodeRect[3]; j++) {
+                            that._addRunlength(nodeRect[0],nodeRect[0]+nodeRect[2],(nodeRect[1]+j),nodes[i].id);
                         }
                         nodeCnt++;
                     }
@@ -313,20 +319,23 @@
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
                         //console.log(nodes[i].label[that.options.labelOption]);
-                        var rect = nodes[i].geometry;
-                        if (isNaN(rect[0]) || isNaN(rect[1]) || isNaN(rect[2]) || isNaN(rect[3]) || rect[2] == 0. || rect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        var bodyRect = nodes[i].geometry.body;
+                        var headerRect = nodes[i].geometry.header;
+                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] == 0. || bodyRect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         var rgb = nodes[i].computedColor;
                         var text = nodes[i].label[that.options.labelOption];
                         ctx.save();
                         ctx.beginPath();
-                        ctx.rect(rect[0],rect[1],rect[2],rect[3]);
-                        ctx.clip();
-                        if ( nodes[i].hasOwnProperty('children')) {
+                        if ( nodes[i].hasOwnProperty('children') && headerRect != null) {
                             // Group Node
+                            ctx.rect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
+                            ctx.clip();
                             ctx.fillStyle = '#555'; // TODO: make an option value
                             ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
-                            ctx.fillText(text,rect[0],rect[1]+10);
+                            ctx.fillText(text,headerRect[0],headerRect[1]+10);
                         } else {
+                            ctx.rect(bodyRect[0],bodyRect[1],bodyRect[2],bodyRect[3]);
+                            ctx.clip();
                             // Leaf Node
                             if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
                                 ctx.fillStyle = '#fff'; // TODO: make an option value
@@ -340,13 +349,13 @@
                             }*/
                             /* Vary font size
                             var textMetrics = ctx.measureText(text);
-                            var ptSize = Math.floor((rect[2] / textMetrics.width)*10);
+                            var ptSize = Math.floor((bodyRect[2] / textMetrics.width)*10);
                             ctx.font = 'italic '+ptSize+'px sans-serif';
-                            ctx.fillText(text,rect[0],rect[1]+ptSize);
+                            ctx.fillText(text,bodyRect[0],bodyRect[1]+ptSize);
                             */
                             // TODO: only render text that fits node
                             ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
-                            ctx.fillText(text,rect[0],rect[1]+10);
+                            ctx.fillText(text,bodyRect[0],bodyRect[1]+10);
                         }
                         ctx.restore();
                     }
@@ -445,24 +454,34 @@
                 var b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 nodeCnt += b.length;
                 for (var i = 0; i < nodes.length; i++) {
-                    nodes[i].geometry = b[i];//.slice();
+                    nodes[i].geometry = {"body":b[i],"header":null};//.slice();
                     that._addNode2NodeList(nodes[i]);
                 }
                 for (var i = 0; i < nodes.length; i++) {
                     if (nodes[i].hasOwnProperty('children')) {
-                        rect = nodes[i].geometry;
-                        // adjust rect according to header height
-                        if (that._isRootNode(nodes[i]) == false && (rect[3]-that.options.groupHeader.height>0)) { // skips root node
-                            rect = [rect[0],rect[1]+that.options.groupHeader.height,rect[2],rect[3]-that.options.groupHeader.height];
+                        var bodyRect = nodes[i].geometry.body;
+                        var headerRect = nodes[i].geometry.header;
+                        // adjust bodyRect according to header height
+                        if (that._isRootNode(nodes[i]) == false && (bodyRect[3]-that.options.groupHeader.height>0)) { // skips root node
+                            headerRect = nodes[i].geometry.header = bodyRect.slice(); // init header rect with copy of body geometry
+                            headerRect[3] = that.options.groupHeader.height;
+                            bodyRect[1] += that.options.groupHeader.height;
+                            bodyRect[3] -= that.options.groupHeader.height;
                         }
-                        // adjust rect according to border width
-                        if (that._isRootNode(nodes[i]) == false && (rect[3]-that.options.nodeBorderWidth>0)) { // skips root node
-                            //rect = [rect[0],rect[1],rect[2]-that.options.nodeBorderWidth,rect[3]-that.options.nodeBorderWidth];
-                            if(that.options.dimensions[0] > rect[0]+rect[2]) rect[2] -= that.options.nodeBorderWidth;
-                            if(that.options.dimensions[1] > rect[1]+rect[3]) rect[3] -= that.options.nodeBorderWidth;
+                        // adjust bodyRect and headerRect according to border width
+                        if (that._isRootNode(nodes[i]) == false // skips root node
+                            && (bodyRect[2]-that.options.nodeBorderWidth>0) 
+                            && (bodyRect[3]-that.options.nodeBorderWidth>0)) {
+                            if(that.options.dimensions[0] > bodyRect[0]+bodyRect[2]) {
+                                bodyRect[2] -= that.options.nodeBorderWidth;
+                                if (headerRect != null) headerRect[2] -= that.options.nodeBorderWidth;
+                            }
+                            if(that.options.dimensions[1] > bodyRect[1]+bodyRect[3]) {
+                                bodyRect[3] -= that.options.nodeBorderWidth;
+                            }
                         }
-                        area = rect[2]*rect[3];
-                        processNodes(rect,nodes[i].children,area,layoutMethod);
+                        area = bodyRect[2]*bodyRect[3];
+                        processNodes(bodyRect,nodes[i].children,area,layoutMethod);
                     }
                 }
             };

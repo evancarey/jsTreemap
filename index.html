@@ -184,9 +184,9 @@
     enableLabels: true</pre></div>
                     <h4>Events</h4>
                     <h5>treemapmousemove</h5>
-                    <p>The <b>treemapmousemove</b> event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
+                    <p>The treemapmousemove event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
                     <h5>treemapmouseclick</h5>
-                    <p>The <b>treemapmouseclick</b> event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
+                    <p>The treemapmouseclick event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
                 </div>
                 <div><p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
             </div>
@@ -240,17 +240,28 @@
                     if ( $("#"+divId).length == 0 ) {
                         $("#highlighter").append("<div id=\""+divId+"\" class=\"highlighter\"></div>");
                     }
+                    var bodyRect = data.nodes[i].geometry.body;
+                    var headerRect = data.nodes[i].geometry.header;
+                    var highlighterRect = [0,0,0,0];
+                    // Adjust for treemap's current offset and check if node has a header rectangle
+                    if (headerRect != null) {
+                        highlighterRect[0] = headerRect[0] + offset.left;
+                        highlighterRect[1] = headerRect[1] + offset.top;
+                        highlighterRect[2] = headerRect[2];
+                        highlighterRect[3] = headerRect[3] + bodyRect[3];
+                    } else {
+                        highlighterRect[0] = bodyRect[0] + offset.left;
+                        highlighterRect[1] = bodyRect[1] + offset.top;
+                        highlighterRect[2] = bodyRect[2];
+                        highlighterRect[3] = bodyRect[3];
+                    }
                     $("#"+divId).css({
                         "display":"inline",
-                        "left":data.nodes[i].geometry[0]+offset.left,
-                        "top":data.nodes[i].geometry[1]+offset.top,
-                        "width":data.nodes[i].geometry[2],
-                        "height":data.nodes[i].geometry[3]
+                        "left":highlighterRect[0],
+                        "top":highlighterRect[1],
+                        "width":highlighterRect[2],
+                        "height":highlighterRect[3]
                     });
-                    /*if (data.nodes[i].hasOwnProperty('children') === false) {
-                        var rgb = data.nodes[i].computedColor;
-                        $("#"+divId).css("background-color","rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+",0.0)");
-                    }*/
                     $("#"+divId).show();
                 }
                 if (highlighterFadeTimeout != undefined) clearHighlighterFade();
@@ -421,11 +432,13 @@
                 });
                 $("#t6").click(function(){
                     $("#treemap").treemap("option","nodeGradient",function(ctx,rect,rgb){
-                        var min = Math.min(rect[2],rect[3]);
-                        var gradient = ctx.createLinearGradient(rect[0]+rect[2]-min,rect[1]+rect[3]-min,rect[0]+rect[2],rect[1]+rect[3]);
-                        gradient.addColorStop(0,TreemapUtils.rgb2hex(rgb));
-                        gradient.addColorStop(0.7,TreemapUtils.rgb2hex(rgb));
-                        gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
+                        var r1 = Math.min(rect[2],rect[3])*0.1;
+                        var r2 = Math.max(rect[2],rect[3]);
+                        var x = rect[0];
+                        var y = rect[1];
+                        var gradient = ctx.createRadialGradient(x,y,r1,x,y,r2);
+                        gradient.addColorStop(0,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.1));
+                        gradient.addColorStop(1,TreemapUtils.lighterColor(TreemapUtils.rgb2hex(rgb),0.1));
                         return gradient;
                     })
                 });
