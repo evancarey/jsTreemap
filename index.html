@@ -35,9 +35,10 @@
             <div id="header"></div>
             <div id="bodyContent">
                 <div id="example1">
-                    <h3>HTML5 Javascript treemap</h3>
+                    <h3>HTML5 Javascript treemap - v0.1.0</h3>
                     <h4>Description</h4>
-                    <p>Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout described in "<a href="http://www.win.tue.nl/~vanwijk/stm.pdf">Squarified Treemaps</a>", by Mark Bruls, Kees Huizing and Jarke J. van Wijk.</p>  
+                    <p>Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout algorithm described in "<a href="http://www.win.tue.nl/~vanwijk/stm.pdf">Squarified Treemaps</a>", by Mark Bruls, Kees Huizing and Jarke J. van Wijk.</p>  
+                    <p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p>
                     <p>Development and testing has primarily been limited to current versions of Chrome and FF.  I rarely test (and fix for) IE.</p>
                     <h4>Example</h4>
                     <p>The following example demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create the treemap, then click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient used to render the treemap leaf nodes.</p>
@@ -121,7 +122,7 @@
     <div class="codeDiv"><pre>
     colorOption: 0</pre></div>
                         <h5>colorGradient</h5>
-                        <p>An object containing the member "colorStops" which is an array of colors and values used to create the treemap's linear color gradient.</p>
+                        <p>An object containing the member "colorStops" which is an array of colors and values used to create a one pixel wide linear color gradient of length determined by option "colorResolution".  The linear color gradient is used as color lookup table by calculating indexes into the linear gradient derived from the colorResoltion and each node's current color value.</p>
     <div class="codeDiv"><pre>
     colorGradient: { 
         colorStops : [
@@ -187,10 +188,15 @@
                     <p>The treemapmousemove event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>
                     <h5>treemapmouseclick</h5>
                     <p>The treemapmouseclick event can be used to trigger dynamic updates to the page's presentation via a Javascript callback.  The sample javascript code in this page demonstrates what information is available to the event handler.</p>
+                    <h4>TODOs</h4>
+                    <ul>
+                        <li>Make group header more configurable.  Make gradient option take a function that returns a gradient like the "nodeGradient" option.  Add font specification and height options.</li>
+                        <li>Make leaf node labelling more configurable.  Either passing in labelling method or make a set of methods selectable/configurable.  To be able to scale and word wrap like Newsmap node labels.</li>
+                    </ul>
                 </div>
-                <div><p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
             </div>
             <div id="footer">
+                <div><p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p></div>
             </div>
         </div>
 	    <script type="text/javascript">
