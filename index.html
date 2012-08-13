@@ -66,8 +66,8 @@
                         <ul>
                             <li>"id" is a unique identifier for the node.</li>
                             <li>"label" is an array of strings that can be used as a node's label.  The element used to label the map depends on the value of the option "labelOption".</li>
-                            <li>"size" is an array of float values that can be used to size a node.  Size values are relative values that represent what fraction of the parent's area the child node should occupy.  The element used to size the node is dependent on the value of the option "sizeOption".</li>
-                            <li>"color" is an array of float values that are used to compute an index into the treemap's color gradient.  The element used to color the node is dependent on the value of the option "colorOption".</li>
+                            <li>"size" is an array of float values in the range [0,1] that can be used to size a node.  Size values are relative values that represent what fraction of the parent's area the child node should occupy.  The element used to size the node is dependent on the value of the option "sizeOption".</li>
+                            <li>"color" is an array of float values in the range [0,1) that are used to compute an index into the treemap's color gradient.  The element used to color the node is dependent on the value of the option "colorOption".</li>
                             <li>"children" is an array of child nodes.</li>
                         </ul>
                         Example:
