@@ -25,15 +25,6 @@
             },
             colorResolution: 1024,
             naColor: "#000",
-            groupHeader: {
-                height: 12,
-                colorStops : [
-                    {"val":0, "color":"#ccc"},
-                    {"val":.4, "color":"#fff"},
-                    {"val":.6, "color":"#fff"},
-                    {"val":1, "color":"#777"}
-                ]
-            },
             innerNodeHeaderHeight: 12,
             innerNodeHeaderGradient: function(ctx,rect,rgb,height) {
                 var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+height);
@@ -464,11 +455,11 @@
                         var bodyRect = nodes[i].geometry.body;
                         var headerRect = nodes[i].geometry.header;
                         // adjust bodyRect according to header height
-                        if (that._isRootNode(nodes[i]) == false && (bodyRect[3]-that.options.groupHeader.height>0)) { // skips root node
+                        if (that._isRootNode(nodes[i]) == false && (bodyRect[3]-that.options.innerNodeHeaderHeight>0)) { // skips root node
                             headerRect = nodes[i].geometry.header = bodyRect.slice(); // init header rect with copy of body geometry
-                            headerRect[3] = that.options.groupHeader.height;
-                            bodyRect[1] += that.options.groupHeader.height;
-                            bodyRect[3] -= that.options.groupHeader.height;
+                            headerRect[3] = that.options.innerNodeHeaderHeight;
+                            bodyRect[1] += that.options.innerNodeHeaderHeight;
+                            bodyRect[3] -= that.options.innerNodeHeaderHeight;
                         }
                         // adjust bodyRect and headerRect according to border width
                         if (that._isRootNode(nodes[i]) == false // skips root node

@@ -35,13 +35,13 @@
             <div id="header"></div>
             <div id="bodyContent">
                 <div id="example1">
-                    <h3>HTML5 Javascript treemap - v0.2.0</h3>
+                    <h3>HTML5 Javascript treemap - v0.2.1</h3>
                     <h4>Description</h4>
                     <p>Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout algorithm described in "<a href="http://www.win.tue.nl/~vanwijk/stm.pdf">Squarified Treemaps</a>", by Mark Bruls, Kees Huizing and Jarke J. van Wijk.</p>  
                     <p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a></p>
                     <p>Development and testing has primarily been limited to current versions of Chrome, Safari and FF.  I rarely test (and fix for) MS/IE.</p>
                     <h4>Example</h4>
-                    <p>The following example demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create the treemap, then click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient used to render the treemap leaf nodes.</p>
+                    <p>The following example demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create and destroy the treemap.  Click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient applied to the treemap's leaf nodes.</p>
                     <input id="t2" type="button" value="800x200"/>
                     <input id="t3" type="button" value="600x400"/>
                     <input id="t4" type="button" value="color1"/>
@@ -193,6 +193,7 @@
                     <ul>
                         <li>Make leaf node labelling more configurable.  Either passing in labelling method or make a set of methods selectable/configurable.  It'd be nice enable scaling and word wrapping like Newsmap's node labels as an option.</li>
                         <li>Make treemap layout algorithm an option.  Currently, the layout method is passed to the refresh layout routine which is sort of configurable by modifying the widget code.  This is not great but it is sort of configurable.  It needs to be improved.</li>
+                        <li>Simplify color gradient option.  Since color gradient's resolution has moved out of the color gradient object the color gradient object only has the one member colorStops.  No need for a color gradient object with one member.</li>
                     </ul>
                 </div>
             </div>
