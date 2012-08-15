@@ -1,3 +1,2 @@
-A Javascript treemap implementation using jQuery widget factory.
-Uses HTML5 canvas to render treemap nodes.
-Lightly tested with Firefox on Mac and Linux(Ubuntu).
+Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout algorithm described in http://www.win.tue.nl/~vanwijk/stm.pdf, Squarified Treemaps, by Mark Bruls, Kees Huizing and Jarke J. van Wijk.  
+Development and testing has primarily been limited to current versions of Chrome, Safari and FF.  I rarely test (and fix for) MS/IE.

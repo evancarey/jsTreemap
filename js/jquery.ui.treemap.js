@@ -34,7 +34,16 @@
                     {"val":1, "color":"#777"}
                 ]
             },
-            nodeGradient: function(ctx,rect,rgb) {
+            innerNodeHeaderHeight: 12,
+            innerNodeHeaderGradient: function(ctx,rect,rgb,height) {
+                var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+height);
+                gradient.addColorStop(0,"#ccc");
+                gradient.addColorStop(.5,"#fff");
+                gradient.addColorStop(.9,"#fff");
+                gradient.addColorStop(1,"#555");
+                return gradient;
+            },
+            leafNodeBodyGradient: function(ctx,rect,rgb) {
                 var r1 = Math.min(rect[2],rect[3])*0.1;
                 var r2 = Math.max(rect[2],rect[3]);
                 var x = rect[0]+rect[2]*0.5;
@@ -204,8 +213,8 @@
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
                     break;
-                case "nodeGradient":
-                    this.options.nodeGradient = value;
+                case "leafNodeBodyGradient":
+                    this.options.leafNodeBodyGradient = value;
                     this._renderNodes();
                     this._renderNodeLabels();
                     this._trigger("refresh",null,this.element);
@@ -253,13 +262,6 @@
         },
 
         _renderNodes: function() {
-            var headerGradient = function(ctx,rect,headerOptions) {
-                var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+headerOptions.height);
-                for (var i in headerOptions.colorStops) {
-                    gradient.addColorStop(parseFloat(headerOptions.colorStops[i].val),headerOptions.colorStops[i].color);
-                }
-                return gradient;
-            };
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
@@ -271,7 +273,7 @@
                         nodes[i].computedColor = rgb;
                         ctx.save();
                         if ( nodes[i].hasOwnProperty('children') && headerRect != null) { // group node
-                            ctx.fillStyle = headerGradient(ctx,headerRect,that.options.groupHeader);
+                            ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,rgb,that.options.innerNodeHeaderHeight);
                             ctx.fillRect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
                             if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
                                 ctx.strokeStyle = "#000";
@@ -287,7 +289,7 @@
                             nodeRect[1] = headerRect[1];
                             nodeRect[3] = headerRect[3] + bodyRect[3];
                         } else { // leaf node
-                            ctx.fillStyle = that.options.nodeGradient.call(that,ctx,bodyRect,rgb);
+                            ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,bodyRect,rgb);
                             ctx.fillRect(bodyRect[0],bodyRect[1],bodyRect[2],bodyRect[3]);
                         }
                         ctx.restore();
