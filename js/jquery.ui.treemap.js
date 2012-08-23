@@ -16,13 +16,11 @@
             // in future get dimensions from containing element maybe?
             dimensions: [600,400],
             // default color gradient
-            colorGradient: { 
-                colorStops : [
-                    {"val":0,"color":"#08f"},
-                    {"val":0.5,"color":"#03f"},
-                    {"val":1,"color":"#005"}
-                ]
-            },
+            colorStops : [
+                {"val":0,"color":"#08f"},
+                {"val":0.5,"color":"#03f"},
+                {"val":1,"color":"#005"}
+            ],
             colorResolution: 1024,
             naColor: "#000",
             innerNodeHeaderHeight: 12,
@@ -46,7 +44,7 @@
             },
             labelOption: 0, // index into label attribute of this.options.nodeData elements
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
-            colorOption: 0, // index into this.options.colorGradients array of color gradient definitions
+            colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
             enableLabels: true,
             nodeData: {}
@@ -208,8 +206,8 @@
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
-                case "colorGradient":
-                    this.options.colorGradient = value;
+                case "colorStops":
+                    this.options.colorStops = value;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
@@ -220,9 +218,9 @@
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
-                case "colorOptionAndGradient":
+                case "colorOptionAndColorStops":
                     this.options.colorOption = value.colorOption;
-                    this.options.colorGradient = value.colorGradient;
+                    this.options.colorStops = value.colorStops;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
@@ -411,14 +409,14 @@
 
         _refreshColorGradient: function() {
             var canvas = document.createElement("canvas");
-            var colorGradient = this.options.colorGradient;
+            var colorStops = this.options.colorStops;
             canvas.setAttribute("width",this.options.colorResolution);
             canvas.setAttribute("height",1);
             if (typeof(G_vmlCanvasManager) != 'undefined') G_vmlCanvasManager.initElement(canvas);
             var ctx = canvas.getContext("2d");
             var gradient1 = ctx.createLinearGradient(0, 0, this.options.colorResolution, 0);
-            for (var i = 0; i < colorGradient.colorStops.length; i += 1) {
-                gradient1.addColorStop(colorGradient.colorStops[i].val,colorGradient.colorStops[i].color);
+            for (var i = 0; i < colorStops.length; i += 1) {
+                gradient1.addColorStop(colorStops[i].val,colorStops[i].color);
             }
             ctx.fillStyle=gradient1;
             ctx.fillRect(0,0,this.options.colorResolution,1);

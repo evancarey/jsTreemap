@@ -121,16 +121,14 @@
                         <p>An index into a node's color array used to specify which color value to apply to the node.</p>
     <div class="codeDiv"><pre>
     colorOption: 0</pre></div>
-                        <h5>colorGradient</h5>
-                        <p>An object containing the member "colorStops" which is an array of colors and values used to create a one pixel wide linear color gradient of length determined by option "colorResolution".  The linear color gradient is used as color lookup table by calculating indexes into the linear gradient derived from the colorResoltion and each node's current color value.</p>
+                        <h5>colorStops</h5>
+                        <p>An array of colors and values used to create a one pixel wide linear color gradient of length determined by option "colorResolution".  The linear color gradient is used as color lookup table by calculating indexes into the linear gradient derived from the colorResoltion and each node's current color value.</p>
     <div class="codeDiv"><pre>
-    colorGradient: { 
-        colorStops : [
-            {"val":0,"color":"#08f"},
-            {"val":0.5,"color":"#03f"},
-            {"val":1,"color":"#005"}
-        ]
-    }</pre></div>
+    colorStops : [
+        {"val":0,"color":"#08f"},
+        {"val":0.5,"color":"#03f"},
+        {"val":1,"color":"#005"}
+    ]</pre></div>
                         <h5>colorResolution</h5>
                         <p>An integer value which is used as the length of the treemap's linear color gradient.</p>
     <div class="codeDiv"><pre>
@@ -193,7 +191,6 @@
                     <ul>
                         <li>Make leaf node labelling more configurable.  Either passing in labelling method or make a set of methods selectable/configurable.  It'd be nice enable scaling and word wrapping like Newsmap's node labels as an option.</li>
                         <li>Make treemap layout algorithm an option.  Currently, the layout method is passed to the refresh layout routine which is sort of configurable by modifying the widget code.  This is not great but it is sort of configurable.  It needs to be improved.</li>
-                        <li>Simplify color gradient option.  Since color gradient's resolution has moved out of the color gradient object the color gradient object only has the one member colorStops.  No need for a color gradient object with one member.</li>
                     </ul>
                 </div>
             </div>
@@ -418,26 +415,22 @@
                     .mouseleave(function(){mouseleaveHandler()});
                 });
                 $("#t5").click(function(){
-                    $("#treemap").treemap("option","colorGradient",{
-                        colorStops:[
-                            {"val":0,  "color":"#a00"},
-                            {"val":.4,"color":"#f00"},
-                            {"val":.5, "color":"#fff"},
-                            {"val":.6,"color":"#0f0"},
-                            {"val":1,  "color":"#070"}
-                        ]
-                    });
+                    $("#treemap").treemap("option","colorStops",[
+                        {"val":0,  "color":"#a00"},
+                        {"val":.4,"color":"#f00"},
+                        {"val":.5, "color":"#fff"},
+                        {"val":.6,"color":"#0f0"},
+                        {"val":1,  "color":"#070"}
+                    ]);
                 });
                 $("#t4").click(function(){
-                    $("#treemap").treemap("option","colorGradient",{
-                        colorStops:[
-                            {"val":0,"color":"#520"},
-                            {"val":.25,"color":"#ff0"},
-                            {"val":0.5,"color":"#fff"},
-                            {"val":0.75,"color":"#0ff"},
-                            {"val":1,"color":"#052"}
-                        ]
-                    });
+                    $("#treemap").treemap("option","colorStops",[
+                        {"val":0,"color":"#520"},
+                        {"val":.25,"color":"#ff0"},
+                        {"val":0.5,"color":"#fff"},
+                        {"val":0.75,"color":"#0ff"},
+                        {"val":1,"color":"#052"}
+                    ]);
                 });
                 $("#t6").click(function(){
                     $("#treemap").treemap("option","leafNodeBodyGradient",function(ctx,rect,rgb){
