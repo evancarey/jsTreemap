@@ -202,27 +202,23 @@
                     this.options.enableLabels = value;
                     this._renderNodes();
                     this._renderNodeLabels();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "leafNodeBodyGradient":
                     this.options.leafNodeBodyGradient = value;
                     this._renderNodes();
                     this._renderNodeLabels();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "colorGradient":
                     this.options.colorGradient = value;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "colorOption":
                     this.options.colorOption = value;
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "colorOptionAndGradient":
                     this.options.colorOption = value.colorOption;
@@ -230,7 +226,6 @@
                     this._refreshColorGradient();
                     this._renderNodes();
                     this._renderNodeLabels();
-                    this._trigger("refresh",null,this.element);
                     break;
                 case "sizeOption":
                     this.options.sizeOption = value;
@@ -249,7 +244,6 @@
             this._refreshColorGradient();
             this._renderNodes();
             this._renderNodeLabels();
-            this._trigger("refresh", null, this.element);
         },
 
         _renderNodes: function() {
