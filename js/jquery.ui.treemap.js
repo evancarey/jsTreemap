@@ -24,13 +24,31 @@
             colorResolution: 1024,
             naColor: "#000",
             innerNodeHeaderHeight: 12,
-            innerNodeHeaderGradient: function(ctx,rect,rgb,height) {
-                var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+height);
+            innerNodeHeaderLabeller: function(ctx,rect,rgb,text) {
+                ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                ctx.clip();
+                ctx.fillStyle = '#555';
+                ctx.font = '0.625em Verdana, Geneva, sans-serif';
+                ctx.fillText(text,rect[0],rect[1]+10);
+            },
+            innerNodeHeaderGradient: function(ctx,rect,rgb) {
+                var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+rect[3]);
                 gradient.addColorStop(0,"#ccc");
                 gradient.addColorStop(.5,"#fff");
                 gradient.addColorStop(.9,"#fff");
                 gradient.addColorStop(1,"#555");
                 return gradient;
+            },
+            leafNodeBodyLabeller: function(ctx,rect,rgb,text) {
+                ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                ctx.clip();
+                if (TreemapUtils.avgRgb(rgb) <= 200) {
+                    ctx.fillStyle = '#fff';
+                } else {
+                    ctx.fillStyle = '#888';
+                }
+                ctx.font = '0.625em Verdana, Geneva, sans-serif';
+                ctx.fillText(text,rect[0],rect[1]+10);
             },
             leafNodeBodyGradient: function(ctx,rect,rgb) {
                 var r1 = Math.min(rect[2],rect[3])*0.1;
@@ -256,7 +274,7 @@
                         nodes[i].computedColor = rgb;
                         ctx.save();
                         if ( nodes[i].hasOwnProperty('children') && headerRect != null) { // group node
-                            ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,rgb,that.options.innerNodeHeaderHeight);
+                            ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,rgb);
                             ctx.fillRect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
                             if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
                                 ctx.strokeStyle = "#000";
@@ -312,35 +330,11 @@
                         ctx.save();
                         ctx.beginPath();
                         if ( nodes[i].hasOwnProperty('children') && headerRect != null) {
-                            // Group Node
-                            ctx.rect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
-                            ctx.clip();
-                            ctx.fillStyle = '#555'; // TODO: make an option value
-                            ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
-                            ctx.fillText(text,headerRect[0],headerRect[1]+10);
+                            // Inner Node
+                            that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,text);
                         } else {
-                            ctx.rect(bodyRect[0],bodyRect[1],bodyRect[2],bodyRect[3]);
-                            ctx.clip();
                             // Leaf Node
-                            if (TreemapUtils.avgRgb(rgb) <= 200) { // TODO: make an option value
-                                ctx.fillStyle = '#fff'; // TODO: make an option value
-                            } else {
-                                ctx.fillStyle = '#888'; // TODO: make an option value
-                            }
-                            /* TODO: improve text fill of node
-                            if (text.length > 13) {
-                                text = text.substr(0,13);
-                                text += '...';
-                            }*/
-                            /* Vary font size
-                            var textMetrics = ctx.measureText(text);
-                            var ptSize = Math.floor((bodyRect[2] / textMetrics.width)*10);
-                            ctx.font = 'italic '+ptSize+'px sans-serif';
-                            ctx.fillText(text,bodyRect[0],bodyRect[1]+ptSize);
-                            */
-                            // TODO: only render text that fits node
-                            ctx.font = '0.625em Verdana, Geneva, sans-serif'; // TODO: make option value
-                            ctx.fillText(text,bodyRect[0],bodyRect[1]+10);
+                            that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,rgb,text);
                         }
                         ctx.restore();
                     }
