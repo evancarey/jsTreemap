@@ -24,12 +24,11 @@
             colorResolution: 1024,
             naColor: "#000",
             innerNodeHeaderHeight: 12,
-            innerNodeHeaderLabeller: function(ctx,rect,rgb,id,text) {
+            innerNodeHeaderLabeller: function(ctx,rect,rgb,id) {
                 ctx.rect(rect[0],rect[1],rect[2],rect[3]);
                 ctx.clip();
                 ctx.fillStyle = '#555';
                 ctx.font = '0.625em Verdana, Geneva, sans-serif';
-                //ctx.fillText(text,rect[0],rect[1]+10);
                 ctx.fillText(id,rect[0],rect[1]+10);
             },
             innerNodeHeaderGradient: function(ctx,rect,rgb) {
@@ -40,7 +39,7 @@
                 gradient.addColorStop(1,"#555");
                 return gradient;
             },
-            leafNodeBodyLabeller: function(ctx,rect,rgb,id,text) {
+            leafNodeBodyLabeller: function(ctx,rect,rgb,id) {
                 ctx.rect(rect[0],rect[1],rect[2],rect[3]);
                 ctx.clip();
                 if (TreemapUtils.avgRgb(rgb) <= 200) {
@@ -49,7 +48,6 @@
                     ctx.fillStyle = '#888';
                 }
                 ctx.font = '0.625em Verdana, Geneva, sans-serif';
-                //ctx.fillText(text,rect[0],rect[1]+10);
                 ctx.fillText(id,rect[0],rect[1]+10);
             },
             leafNodeBodyGradient: function(ctx,rect,rgb) {
