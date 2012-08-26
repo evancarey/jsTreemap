@@ -6,7 +6,7 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
-        <script type="text/javascript" src="blah.js"></script>
+        <script type="text/javascript" src="moboxAndLabelData.js"></script>
         <style type="text/css">
             #content { margin-right: auto; margin-left: auto; width: 900px; }
             canvas { border: 1px solid #f00; }
@@ -59,13 +59,13 @@
                     <h4>Options</h4>
                         <h5>dimensions</h5>
                         <p>An array of two elements the first being the width and the second is the height (in pixels) of the canvas element used to render the treemap.  Example: set the width to 600 pixels and height to 400 pixels.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     dimensions: [600,400]</pre></div>
                         <h5>nodeData</h5>
-                        <p>A data structure containing the nodes to be presented in the treemap.  Each node has the members: "id", "label", "size", and "color".  Internal nodes have the additional member "children".  
+                        <p>A data structure containing the nodes to be presented in the treemap.  Each node has the members: "id", "size", and "color".  Internal nodes have the additional member "children".  
                         <ul>
                             <li>"id" is a unique identifier for the node.</li>
-                            <li>"label" is an array of strings that can be used as a node's label.  The element used to label the map depends on the value of the option "labelOption".</li>
                             <li>"size" is an array of float values in the range [0,1] that can be used to size a node.  Size values are relative values that represent what fraction of the parent's area the child node should occupy.  The element used to size the node is dependent on the value of the option "sizeOption".</li>
                             <li>"color" is an array of float values in the range [0,1) that are used to compute an index into the treemap's color gradient.  The element used to color the node is dependent on the value of the option "colorOption".</li>
                             <li>"children" is an array of child nodes.</li>
@@ -75,31 +75,26 @@
     <div class="codeDiv"><pre>
     nodeData: {
         "id":"2fc414e2", 
-        "label":["root"], 
         "size":[1.0], 
         "color":[1.0], 
         "children":[
             {
                 "id":"23f627dc", 
-                "label":["blah1"], 
                 "size":[.25], 
                 "color":[.39], 
                 "children":[
                     {
                         "id":"ce96d31f", 
-                        "label":["blah11"], 
                         "size":[.25], 
                         "color":[.74]
                     },
                     {
                         "id":"91e0ea1d", 
-                        "label":["blah12"], 
                         "size":[.25], 
                         "color":[.98]
                     },
                     {
                         "id":"62188591", 
-                        "label":["blah13"], 
                         "size":[.16667], 
                         "color":[.39]
                     },
@@ -109,20 +104,19 @@
             ...
         ]
     }</pre></div>
-                        <h5>labelOption</h5>
-                        <p>An index into a node's label array used to specify which label string to apply to the node.</p>
-    <div class="codeDiv"><pre>
-    labelOption: 0</pre></div>
                         <h5>sizeOption</h5>
                         <p>An index into a node's size array used to specify which size value to apply to the node.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     sizeOption: 0</pre></div>
                         <h5>colorOption</h5>
                         <p>An index into a node's color array used to specify which color value to apply to the node.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     colorOption: 0</pre></div>
                         <h5>colorStops</h5>
                         <p>An array of colors and values used to create a one pixel wide linear color gradient of length determined by option "colorResolution".  The linear color gradient is used as color lookup table by calculating indexes into the linear gradient derived from the colorResoltion and each node's current color value.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     colorStops : [
         {"val":0,"color":"#08f"},
@@ -131,10 +125,12 @@
     ]</pre></div>
                         <h5>colorResolution</h5>
                         <p>An integer value which is used as the length of the treemap's linear color gradient.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     colorResolution: 1024</pre></div>
                         <h5>naColor</h5>
                         <p>A hex color value used for nodes with null values for the current colorOption.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     naColor: "#000"</pre></div>
                         <h5>innerNodeHeaderGradient</h5>
@@ -145,6 +141,7 @@
                             <li>"rgb" is a node's color value obtained by treemap's lookup into its current color gradient.</li>
                         </ul>
                         </p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     innerNodeHeaderGradient: function(ctx,rect,rgb) {
         var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+rect[3]);
@@ -162,6 +159,7 @@
                             <li>"rgb" is a node's color value obtained by treemap's lookup into its current color gradient.</li>
                         </ul>
                         </p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     leafNodeBodyGradient: function(ctx,rect,rgb) {
         var r1 = Math.min(rect[2],rect[3])*0.1;
@@ -174,33 +172,35 @@
         return gradient;
     }</pre></div>
                         <h5>innerNodeHeaderLabeller</h5>
-                        <p>A function that renders text into inner node header rectangles.  The function must accept 4 arguments: "ctx", "rect", "rgb" and "text".
+                        <p>A function that renders text into inner node header rectangles.  The function must accept 4 arguments: "ctx", "rect", "rgb" and "id".
                         <ul>
                             <li>"ctx" is the 2d drawing context of the treemap's canvas element.</li>
                             <li>"rect" is a node's header rectangle generated by treemap layout algorithm.</li>
                             <li>"rgb" is a node's color value obtained by treemap's lookup into its current color gradient.</li>
-                            <li>"text" is a node's label value base on the current label option.</li>
+                            <li>"id" is the node's unique identifier.</li>
                         </ul>
                         </p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
-    innerNodeHeaderLabeller: function(ctx,rect,rgb,text) {
+    innerNodeHeaderLabeller: function(ctx,rect,rgb,id) {
         ctx.rect(rect[0],rect[1],rect[2],rect[3]);
         ctx.clip();
         ctx.fillStyle = '#555';
         ctx.font = '0.625em Verdana, Geneva, sans-serif';
-        ctx.fillText(text,rect[0],rect[1]+10);
+        ctx.fillText(id,rect[0],rect[1]+10);
     }</pre></div>
                         <h5>leafNodeBodyLabeller</h5>
-                        <p>A function that renders text into leaf node body rectangles.  The function must accept 4 arguments: "ctx", "rect", "rgb" and "text".
+                        <p>A function that renders text into leaf node body rectangles.  The function must accept 4 arguments: "ctx", "rect", "rgb" and "id".
                         <ul>
                             <li>"ctx" is the 2d drawing context of the treemap's canvas element.</li>
                             <li>"rect" is a node's body rectangle generated by treemap layout algorithm.</li>
                             <li>"rgb" is a node's color value obtained by treemap's lookup into its current color gradient.</li>
-                            <li>"text" is a node's label value base on the current label option.</li>
+                            <li>"id" is the node's unique identifier.</li>
                         </ul>
                         </p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
-    leafNodeBodyLabeller: function(ctx,rect,rgb,text) {
+    leafNodeBodyLabeller: function(ctx,rect,rgb,id) {
         ctx.rect(rect[0],rect[1],rect[2],rect[3]);
         ctx.clip();
         if (TreemapUtils.avgRgb(rgb) <= 200) {
@@ -209,14 +209,16 @@
             ctx.fillStyle = '#888';
         }
         ctx.font = '0.625em Verdana, Geneva, sans-serif';
-        ctx.fillText(text,rect[0],rect[1]+10);
+        ctx.fillText(id,rect[0],rect[1]+10);
     }</pre></div>
                         <h5>nodeBorderWidth</h5>
                         <p>Number of pixels to use as spacing around internal nodes.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     nodeBorderWidth: 0</pre></div>
                         <h5>enableLabels</h5>
                         <p>Boolean used to enable or disable node labelling.</p>
+    <p>Default:</p>
     <div class="codeDiv"><pre>
     enableLabels: true</pre></div>
                     <h4>Events</h4>
@@ -317,10 +319,10 @@
                     $("#mouseoverbox").css({"background-color":"rgba(255,255,200,0.85)"});
                 }
                 $("#mouseoverbox").html("<span>"
-                    + "<p><b>" + blah[data.nodes[0].id].label + "</b></p>"
-                    + "<p>x = <b>" + blah[data.nodes[0].id].x + "</b></p>"
-                    + "<p>y = <b>" + blah[data.nodes[0].id].y + "</b></p>"
-                    + "<p>z = <b>" + blah[data.nodes[0].id].z + "</b></p>"
+                    + "<p><b>" + moboxAndLabelData[data.nodes[0].id].label + "</b></p>"
+                    + "<p>x = <b>" + moboxAndLabelData[data.nodes[0].id].x + "</b></p>"
+                    + "<p>y = <b>" + moboxAndLabelData[data.nodes[0].id].y + "</b></p>"
+                    + "<p>z = <b>" + moboxAndLabelData[data.nodes[0].id].z + "</b></p>"
                     + "</span>");
                 var mouseoverboxWidth = $("#mouseoverbox").width();
                 var mouseoverboxHeight = $("#mouseoverbox").height();
@@ -352,77 +354,77 @@
                         "dimensions":[900,300],
                         "nodeBorderWidth":1,
                         "nodeData": {
-                            "id":"2fc414e2", "label":["root"], "size":[1.0], "color":[1.0], "children":[
-                                {"id":"23f627dc", "label":["blah1"], "size":[.25], "color":[.39], "children":[
-                                    {"id":"ce96d31f", "label":["blah11"], "size":[.25], "color":[.74]},
-                                    {"id":"91e0ea1d", "label":["blah12"], "size":[.25], "color":[.98]},
-                                    {"id":"62188591", "label":["blah13"], "size":[.16667], "color":[.39]},
-                                    {"id":"b80861a4", "label":["blah14"], "size":[.125], "color":[.19]},
-                                    {"id":"9216f340", "label":["blah15"], "size":[.083333], "color":[.52]},
-                                    {"id":"40236148", "label":["blah16"], "size":[.083333], "color":[.98]},
-                                    {"id":"c12264b7", "label":["blah17"], "size":[.041666667], "color":[.74]}
+                            "id":"2fc414e2", "size":[1.0], "color":[1.0], "children":[
+                                {"id":"23f627dc", "size":[.25], "color":[.39], "children":[
+                                    {"id":"ce96d31f", "size":[.25], "color":[.74]},
+                                    {"id":"91e0ea1d", "size":[.25], "color":[.98]},
+                                    {"id":"62188591", "size":[.16667], "color":[.39]},
+                                    {"id":"b80861a4", "size":[.125], "color":[.19]},
+                                    {"id":"9216f340", "size":[.083333], "color":[.52]},
+                                    {"id":"40236148", "size":[.083333], "color":[.98]},
+                                    {"id":"c12264b7", "size":[.041666667], "color":[.74]}
                                 ]},
-                                {"id":"126debf5", "label":["blah2"], "size":[.25], "color":[.52], "children":[
-                                    {"id":"634c7555", "label":["blah21"], "size":[.25], "color":[.32]},
-                                    {"id":"2eac5833", "label":["blah22"], "size":[.25], "color":[.39]},
-                                    {"id":"50790bdd", "label":["blah23"], "size":[.16667], "color":[.32]},
-                                    {"id":"15b8f1e1", "label":["blah24"], "size":[.125], "color":[.85]},
-                                    {"id":"4e14522d", "label":["blah25"], "size":[.083333], "color":[.52]},
-                                    {"id":"92cf9150", "label":["blah26"], "size":[.083333], "color":[.63]},
-                                    {"id":"97794307", "label":["blah27"], "size":[.041666667], "color":[.19]}
+                                {"id":"126debf5", "size":[.25], "color":[.52], "children":[
+                                    {"id":"634c7555", "size":[.25], "color":[.32]},
+                                    {"id":"2eac5833", "size":[.25], "color":[.39]},
+                                    {"id":"50790bdd", "size":[.16667], "color":[.32]},
+                                    {"id":"15b8f1e1", "size":[.125], "color":[.85]},
+                                    {"id":"4e14522d", "size":[.083333], "color":[.52]},
+                                    {"id":"92cf9150", "size":[.083333], "color":[.63]},
+                                    {"id":"97794307", "size":[.041666667], "color":[.19]}
                                 ]},
-                                {"id":"7e3f0349", "label":["blah3"], "size":[.16667], "color":[.74], "children":[
-                                    {"id":"1dbf73a8", "label":["blah31"], "size":[.25], "color":[.39]},
-                                    {"id":"caefaba5", "label":["blah32"], "size":[.25], "color":[.85]},
-                                    {"id":"89bd30be", "label":["blah33"], "size":[.16667], "color":[.63], "children":[
-                                        {"id":"7d56b381", "label":["blah331"], "size":[.25], "color":[.39]},
-                                        {"id":"5f3fcf29", "label":["blah332"], "size":[.25], "color":[.85]},
-                                        {"id":"50aa205c", "label":["blah333"], "size":[.16667], "color":[.63]},
-                                        {"id":"beba7a53", "label":["blah334"], "size":[.125], "color":[.52]},
-                                        {"id":"b15f0ae4", "label":["blah335"], "size":[.083333], "color":[.74]},
-                                        {"id":"cecbda69", "label":["blah336"], "size":[.083333], "color":[.29]},
-                                        {"id":"496c7052", "label":["blah337"], "size":[.041666667], "color":[.98]}
+                                {"id":"7e3f0349", "size":[.16667], "color":[.74], "children":[
+                                    {"id":"1dbf73a8", "size":[.25], "color":[.39]},
+                                    {"id":"caefaba5", "size":[.25], "color":[.85]},
+                                    {"id":"89bd30be", "size":[.16667], "color":[.63], "children":[
+                                        {"id":"7d56b381", "size":[.25], "color":[.39]},
+                                        {"id":"5f3fcf29", "size":[.25], "color":[.85]},
+                                        {"id":"50aa205c", "size":[.16667], "color":[.63]},
+                                        {"id":"beba7a53", "size":[.125], "color":[.52]},
+                                        {"id":"b15f0ae4", "size":[.083333], "color":[.74]},
+                                        {"id":"cecbda69", "size":[.083333], "color":[.29]},
+                                        {"id":"496c7052", "size":[.041666667], "color":[.98]}
                                     ]},
-                                    {"id":"57582ef2", "label":["blah34"], "size":[.125], "color":[.52]},
-                                    {"id":"ef593822", "label":["blah35"], "size":[.083333], "color":[.74]},
-                                    {"id":"c93cd65d", "label":["blah36"], "size":[.083333], "color":[.29]},
-                                    {"id":"81c3e4d8", "label":["blah37"], "size":[.041666667], "color":[.98]}
+                                    {"id":"57582ef2", "size":[.125], "color":[.52]},
+                                    {"id":"ef593822", "size":[.083333], "color":[.74]},
+                                    {"id":"c93cd65d", "size":[.083333], "color":[.29]},
+                                    {"id":"81c3e4d8", "size":[.041666667], "color":[.98]}
                                 ]},
-                                {"id":"a3bec3a8", "label":["blah4"], "size":[.125], "color":[.52], "children":[
-                                    {"id":"27605654", "label":["blah41"], "size":[.25], "color":[.19]},
-                                    {"id":"a113de2d", "label":["blah42"], "size":[.25], "color":[.52]},
-                                    {"id":"121fec09", "label":["blah43"], "size":[.16667], "color":[.09]},
-                                    {"id":"0b1c34bf", "label":["blah44"], "size":[.125], "color":[.32]},
-                                    {"id":"6e4576d4", "label":["blah45"], "size":[.083333], "color":[.39]},
-                                    {"id":"55d92db9", "label":["blah46"], "size":[.083333], "color":[.31]},
-                                    {"id":"8dca9e0e", "label":["blah47"], "size":[.041666667], "color":[.74]}
+                                {"id":"a3bec3a8", "size":[.125], "color":[.52], "children":[
+                                    {"id":"27605654", "size":[.25], "color":[.19]},
+                                    {"id":"a113de2d", "size":[.25], "color":[.52]},
+                                    {"id":"121fec09", "size":[.16667], "color":[.09]},
+                                    {"id":"0b1c34bf", "size":[.125], "color":[.32]},
+                                    {"id":"6e4576d4", "size":[.083333], "color":[.39]},
+                                    {"id":"55d92db9", "size":[.083333], "color":[.31]},
+                                    {"id":"8dca9e0e", "size":[.041666667], "color":[.74]}
                                 ]},
-                                {"id":"c467043d", "label":["blah5"], "size":[.083333], "color":[.39], "children":[
-                                    {"id":"e0b3ced3", "label":["blah51"], "size":[.25], "color":[.31]},
-                                    {"id":"904ad26e", "label":["blah52"], "size":[.25], "color":[.85]},
-                                    {"id":"8f58816c", "label":["blah53"], "size":[.16667], "color":[.63]},
-                                    {"id":"ee1ca0bb", "label":["blah54"], "size":[.125], "color":[.52]},
-                                    {"id":"1f7df236", "label":["blah55"], "size":[.083333], "color":[.98]},
-                                    {"id":"e411614a", "label":["blah56"], "size":[.083333], "color":[.32]},
-                                    {"id":"234fa244", "label":["blah57"], "size":[.041666667], "color":[.39]}
+                                {"id":"c467043d", "size":[.083333], "color":[.39], "children":[
+                                    {"id":"e0b3ced3", "size":[.25], "color":[.31]},
+                                    {"id":"904ad26e", "size":[.25], "color":[.85]},
+                                    {"id":"8f58816c", "size":[.16667], "color":[.63]},
+                                    {"id":"ee1ca0bb", "size":[.125], "color":[.52]},
+                                    {"id":"1f7df236", "size":[.083333], "color":[.98]},
+                                    {"id":"e411614a", "size":[.083333], "color":[.32]},
+                                    {"id":"234fa244", "size":[.041666667], "color":[.39]}
                                 ]},
-                                {"id":"ae6f93e2", "label":["blah6"], "size":[.083333], "color":[.98], "children":[
-                                    {"id":"4511fee8", "label":["blah61"], "size":[.25], "color":[.19]},
-                                    {"id":"ab206acd", "label":["blah62"], "size":[.25], "color":[.74]},
-                                    {"id":"d436ff53", "label":["blah63"], "size":[.16667], "color":[.29]},
-                                    {"id":"25a300d6", "label":["blah64"], "size":[.125], "color":[.52]},
-                                    {"id":"391c72a8", "label":["blah65"], "size":[.083333], "color":[.74]},
-                                    {"id":"7071d634", "label":["blah66"], "size":[.083333], "color":[.39]},
-                                    {"id":"939985e5", "label":["blah67"], "size":[.041666667], "color":[.63]}
+                                {"id":"ae6f93e2", "size":[.083333], "color":[.98], "children":[
+                                    {"id":"4511fee8", "size":[.25], "color":[.19]},
+                                    {"id":"ab206acd", "size":[.25], "color":[.74]},
+                                    {"id":"d436ff53", "size":[.16667], "color":[.29]},
+                                    {"id":"25a300d6", "size":[.125], "color":[.52]},
+                                    {"id":"391c72a8", "size":[.083333], "color":[.74]},
+                                    {"id":"7071d634", "size":[.083333], "color":[.39]},
+                                    {"id":"939985e5", "size":[.041666667], "color":[.63]}
                                 ]},
-                                {"id":"08095bd4", "label":["blah7"], "size":[.041666667], "color":[.85], "children":[
-                                    {"id":"0e27d9c9", "label":["blah71"], "size":[.25], "color":[.39]},
-                                    {"id":"2fa79804", "label":["blah72"], "size":[.25], "color":[.52]},
-                                    {"id":"e3ede063", "label":["blah73"], "size":[.16667], "color":[.74]},
-                                    {"id":"40e92699", "label":["blah74"], "size":[.125], "color":[.85]},
-                                    {"id":"9296b705", "label":["blah75"], "size":[.083333], "color":[.98]},
-                                    {"id":"432db33d", "label":["blah76"], "size":[.083333], "color":[.74]},
-                                    {"id":"4a01b07c", "label":["blah77"], "size":[.041666667], "color":[.52]}
+                                {"id":"08095bd4", "size":[.041666667], "color":[.85], "children":[
+                                    {"id":"0e27d9c9", "size":[.25], "color":[.39]},
+                                    {"id":"2fa79804", "size":[.25], "color":[.52]},
+                                    {"id":"e3ede063", "size":[.16667], "color":[.74]},
+                                    {"id":"40e92699", "size":[.125], "color":[.85]},
+                                    {"id":"9296b705", "size":[.083333], "color":[.98]},
+                                    {"id":"432db33d", "size":[.083333], "color":[.74]},
+                                    {"id":"4a01b07c", "size":[.041666667], "color":[.52]}
                                 ]},
                             ]
                         }

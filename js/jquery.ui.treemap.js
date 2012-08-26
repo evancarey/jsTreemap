@@ -24,12 +24,13 @@
             colorResolution: 1024,
             naColor: "#000",
             innerNodeHeaderHeight: 12,
-            innerNodeHeaderLabeller: function(ctx,rect,rgb,text) {
+            innerNodeHeaderLabeller: function(ctx,rect,rgb,id,text) {
                 ctx.rect(rect[0],rect[1],rect[2],rect[3]);
                 ctx.clip();
                 ctx.fillStyle = '#555';
                 ctx.font = '0.625em Verdana, Geneva, sans-serif';
-                ctx.fillText(text,rect[0],rect[1]+10);
+                //ctx.fillText(text,rect[0],rect[1]+10);
+                ctx.fillText(id,rect[0],rect[1]+10);
             },
             innerNodeHeaderGradient: function(ctx,rect,rgb) {
                 var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+rect[3]);
@@ -39,7 +40,7 @@
                 gradient.addColorStop(1,"#555");
                 return gradient;
             },
-            leafNodeBodyLabeller: function(ctx,rect,rgb,text) {
+            leafNodeBodyLabeller: function(ctx,rect,rgb,id,text) {
                 ctx.rect(rect[0],rect[1],rect[2],rect[3]);
                 ctx.clip();
                 if (TreemapUtils.avgRgb(rgb) <= 200) {
@@ -48,7 +49,8 @@
                     ctx.fillStyle = '#888';
                 }
                 ctx.font = '0.625em Verdana, Geneva, sans-serif';
-                ctx.fillText(text,rect[0],rect[1]+10);
+                //ctx.fillText(text,rect[0],rect[1]+10);
+                ctx.fillText(id,rect[0],rect[1]+10);
             },
             leafNodeBodyGradient: function(ctx,rect,rgb) {
                 var r1 = Math.min(rect[2],rect[3])*0.1;
@@ -60,7 +62,6 @@
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
-            labelOption: 0, // index into label attribute of this.options.nodeData elements
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
             colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
@@ -321,20 +322,18 @@
             var processNodes = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) == false) { // skip root node
-                        //console.log(nodes[i].label[that.options.labelOption]);
                         var bodyRect = nodes[i].geometry.body;
                         var headerRect = nodes[i].geometry.header;
                         if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] == 0. || bodyRect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         var rgb = nodes[i].computedColor;
-                        var text = nodes[i].label[that.options.labelOption];
                         ctx.save();
                         ctx.beginPath();
                         if ( nodes[i].hasOwnProperty('children') && headerRect != null) {
                             // Inner Node
-                            that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,text);
+                            that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,nodes[i].id);
                         } else {
                             // Leaf Node
-                            that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,rgb,text);
+                            that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,rgb,nodes[i].id);
                         }
                         ctx.restore();
                     }
