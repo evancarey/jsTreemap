@@ -326,9 +326,11 @@
                         var rgb = nodes[i].computedColor;
                         ctx.save();
                         ctx.beginPath();
-                        if ( nodes[i].hasOwnProperty('children') && headerRect != null) {
-                            // Inner Node
-                            that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,nodes[i].id);
+                        if ( nodes[i].hasOwnProperty('children')) {
+                            if (headerRect != null) {
+                                // Inner Node
+                                that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,nodes[i].id);
+                            }
                         } else {
                             // Leaf Node
                             that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,rgb,nodes[i].id);
