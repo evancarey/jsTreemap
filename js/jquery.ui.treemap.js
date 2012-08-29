@@ -34,8 +34,8 @@
             innerNodeHeaderGradient: function(ctx,rect,rgb) {
                 var gradient = ctx.createLinearGradient(rect[0],rect[1],rect[0],rect[1]+rect[3]);
                 gradient.addColorStop(0,"#ccc");
-                gradient.addColorStop(.5,"#fff");
-                gradient.addColorStop(.9,"#fff");
+                gradient.addColorStop(0.5,"#fff");
+                gradient.addColorStop(0.9,"#fff");
                 gradient.addColorStop(1,"#555");
                 return gradient;
             },
@@ -89,26 +89,26 @@
                 this.setX = function(x) {
                     rect[2] -= x - rect[0];
                     rect[0] = x;
-                }
+                };
                 this.setY = function(y) {
                     rect[3] -= y - rect[1];
                     rect[1] = y;
-                }
+                };
                 this.getX = function() {
                     return rect[0];
-                }
+                };
                 this.getY = function() {
                     return rect[1];
-                }
+                };
                 this.getW = function() {
                     return rect[2];
-                }
+                };
                 this.getH = function() {
                     return rect[3];
-                }
+                };
                 this.getWidth = function() {
                     return Math.min(rect[2],rect[3]);
-                }
+                };
             };
             //
             // The function worst() gives the highest aspect ratio of a list 
@@ -135,26 +135,30 @@
             // Take row of values and calculate the set of rectangles 
             // that will fit in the current subrectangle.
             var layoutrow = function(row) {
-                var x = subrect.getX();
-                var y = subrect.getY();
-                var maxX = x + subrect.getW();
-                var maxY = y + subrect.getH();
+                var x = subrect.getX(),
+                    y = subrect.getY(),
+                    maxX = x + subrect.getW(),
+                    maxY = y + subrect.getH(),
+                    rowHeight,
+                    i,
+                    w;
+
                 if (subrect.getW() < subrect.getH()) {
-                    var rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getW());
+                    rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getW());
                     if (y+rowHeight >= maxY) { rowHeight = maxY-y; }
-                    for (var i = 0; i < row.length; i++) {
-                        var w = Math.ceil(row[i]/rowHeight);
-                        if (x+w > maxX || i+1 == row.length) { w = maxX-x; }
+                    for (i = 0; i < row.length; i++) {
+                        w = Math.ceil(row[i]/rowHeight);
+                        if (x+w > maxX || i+1 === row.length) { w = maxX-x; }
                         layout.push([x,y,w,rowHeight]);
                         x = (x+w);
                     }
                     subrect.setY(y+rowHeight);
                 } else {
-                    var rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getH());
+                    rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getH());
                     if (x+rowHeight >= maxX) { rowHeight = maxX-x; }
-                    for (var i = 0; i < row.length; i++) {
-                        var w = Math.ceil(row[i]/rowHeight);
-                        if (y+w > maxY || i+1 == row.length) { w = maxY-y; }
+                    for (i = 0; i < row.length; i++) {
+                        w = Math.ceil(row[i]/rowHeight);
+                        if (y+w > maxY || i+1 === row.length) { w = maxY-y; }
                         layout.push([x,y,rowHeight,w]);
                         y = (y+w);
                     }
@@ -168,7 +172,7 @@
                 var row = [];
                 row.push(children.shift()); // descending input
                 //row.push(children.pop()); // ascending input
-                if (children.length == 0) {
+                if (children.length === 0) {
                     return row;
                 }
                 var newRow = row.slice();
@@ -263,19 +267,30 @@
 
         _renderNodes: function() {
             var processNodes = function(nodes) {
-                for (var i = 0; i < nodes.length; i++) {
-                    if (that._isRootNode(nodes[i]) == false) { // skip root node
-                        var bodyRect = nodes[i].geometry.body;
-                        var headerRect = nodes[i].geometry.header;
-                        var nodeRect = bodyRect.slice();
-                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] == 0. || bodyRect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
-                        var rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
+                var bodyRect,
+                    headerRect,
+                    nodeRect,
+                    rgb,
+                    i,
+                    j;
+
+                for (i = 0; i < nodes.length; i++) {
+                    if (that._isRootNode(nodes[i]) === false) { // skip root node
+                        bodyRect = nodes[i].geometry.body;
+                        headerRect = nodes[i].geometry.header;
+                        nodeRect = bodyRect.slice();
+
+                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] === 0 || bodyRect[3] === 0) {
+                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        }
+
+                        rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                         nodes[i].computedColor = rgb;
                         ctx.save();
-                        if ( nodes[i].hasOwnProperty('children') && headerRect != null) { // group node
+                        if ( nodes[i].hasOwnProperty('children') && headerRect !== null) { // group node
                             ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,rgb);
                             ctx.fillRect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
-                            if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth == 0) {
+                            if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth === 0) {
                                 ctx.strokeStyle = "#000";
                                 ctx.lineWidth = 0.5;
                                 ctx.beginPath();
@@ -294,7 +309,7 @@
                         }
                         ctx.restore();
                         // Add node geometry to scanline map
-                        for (var j = 0; j < nodeRect[3]; j++) {
+                        for (j = 0; j < nodeRect[3]; j++) {
                             that._addRunlength(nodeRect[0],nodeRect[0]+nodeRect[2],(nodeRect[1]+j),nodes[i].id);
                         }
                         nodeCnt++;
@@ -316,18 +331,30 @@
         },
 
         _renderNodeLabels: function() {
-            if (this.options.enableLabels != true) return;
+            if (this.options.enableLabels !== true) {
+                return;
+            }
+
             var processNodes = function(nodes) {
-                for (var i = 0; i < nodes.length; i++) {
-                    if (that._isRootNode(nodes[i]) == false) { // skip root node
-                        var bodyRect = nodes[i].geometry.body;
-                        var headerRect = nodes[i].geometry.header;
-                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] == 0. || bodyRect[3] == 0.) continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
-                        var rgb = nodes[i].computedColor;
+                var bodyRect,
+                    headerRect,
+                    rgb,
+                    i;
+
+                for (i = 0; i < nodes.length; i++) {
+                    if (that._isRootNode(nodes[i]) === false) { // skip root node
+                        bodyRect = nodes[i].geometry.body;
+                        headerRect = nodes[i].geometry.header;
+
+                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] === 0 || bodyRect[3] === 0) {
+                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        }
+
+                        rgb = nodes[i].computedColor;
                         ctx.save();
                         ctx.beginPath();
                         if ( nodes[i].hasOwnProperty('children')) {
-                            if (headerRect != null) {
+                            if (headerRect !== null) {
                                 // Inner Node
                                 that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,nodes[i].id);
                             }
@@ -364,51 +391,65 @@
             canvas.setAttribute("height",this.options.dimensions[1]);
             var that = this; // to pass this to event handler
             this.element.append(canvas).mousemove(function(e){
-                var offset = that.element.offset();
-                var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
-                var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
-                var width = that.options.dimensions[0];
-                var height = that.options.dimensions[1];
-                if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
-                {
-                    var ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
-                    var nodes = [];
-                    for ( var i = 0; i < ids.length; i++ )
-                    {
+                var offset = that.element.offset(),
+                    offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
+                    offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
+                    width = that.options.dimensions[0],
+                    height = that.options.dimensions[1],
+                    ids,
+                    nodes,
+                    data,
+                    i;
+
+                if (e.pageX < offsetX+width && e.pageY < (offsetY+height)) {
+                    ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                    nodes = [];
+                    for (i = 0; i < ids.length; i++ ) {
                         nodes.push(that._getNode([ids[i]]));
                     }
-                    var data = {"nodes": nodes, "ids": ids};
+                    data = {"nodes": nodes, "ids": ids};
                     that._trigger('mousemove',e,data);
                 }
             }).click(function(e){
-                var offset = that.element.offset();
-                var offsetX = parseInt(offset.left); // offsets are float values on mac/FF
-                var offsetY = parseInt(offset.top); // convert them to ints so coordsToId will work
-                var width = that.options.dimensions[0];
-                var height = that.options.dimensions[1];
-                if (e.pageX < offsetX+width && e.pageY < (offsetY+height))
-                {
-                    var ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
-                    var nodes = [];
-                    for ( var i = 0; i < ids.length; i++ )
-                    {
+                var offset = that.element.offset(),
+                    offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
+                    offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
+                    width = that.options.dimensions[0],
+                    height = that.options.dimensions[1],
+                    ids,
+                    nodes,
+                    data,
+                    i;
+
+                if (e.pageX < offsetX+width && e.pageY < (offsetY+height)) {
+                    ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                    nodes = [];
+                    for (i = 0; i < ids.length; i++ ) {
                         nodes.push(that._getNode([ids[i]]));
                     }
-                    var data = {"nodes": nodes, "ids": ids};
+                    data = {"nodes": nodes, "ids": ids};
                     that._trigger('click',e,data);
                 }
             });
         },
 
         _refreshColorGradient: function() {
-            var canvas = document.createElement("canvas");
-            var colorStops = this.options.colorStops;
+            var canvas = document.createElement("canvas"),
+                colorStops = this.options.colorStops,
+                ctx,
+                gradient1,
+                i;
+
             canvas.setAttribute("width",this.options.colorResolution);
             canvas.setAttribute("height",1);
-            if (typeof(G_vmlCanvasManager) != 'undefined') G_vmlCanvasManager.initElement(canvas);
-            var ctx = canvas.getContext("2d");
-            var gradient1 = ctx.createLinearGradient(0, 0, this.options.colorResolution, 0);
-            for (var i = 0; i < colorStops.length; i += 1) {
+
+            if (typeof(G_vmlCanvasManager) !== 'undefined') {
+                G_vmlCanvasManager.initElement(canvas);
+            }
+
+            ctx = canvas.getContext("2d");
+            gradient1 = ctx.createLinearGradient(0, 0, this.options.colorResolution, 0);
+            for (i = 0; i < colorStops.length; i += 1) {
                 gradient1.addColorStop(colorStops[i].val,colorStops[i].color);
             }
             ctx.fillStyle=gradient1;
@@ -418,41 +459,51 @@
 
         _refreshLayout: function(layoutMethod) {
             function processNodes(rect,nodes,area,layoutMethod) {
+                var a = [],
+                    bodyRect,
+                    headerRect,
+                    b,
+                    i;
+
                 nodes.sort(function(x,y){
-                    if (x.size[that.options.sizeOption] > y.size[that.options.sizeOption])
+                    if (x.size[that.options.sizeOption] > y.size[that.options.sizeOption]) {
                         return -1;
-                    if (x.size[that.options.sizeOption] < y.size[that.options.sizeOption])
+                    }
+                    if (x.size[that.options.sizeOption] < y.size[that.options.sizeOption]) {
                         return 1;
+                    }
                     return 0;
                 });
-                var a = [];
-                for (var i = 0; i < nodes.length; i++) {
+
+                for (i = 0; i < nodes.length; i++) {
                     a[i]=nodes[i].size[that.options.sizeOption]*area;
                 }
-                var b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
+                b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 nodeCnt += b.length;
-                for (var i = 0; i < nodes.length; i++) {
+                for (i = 0; i < nodes.length; i++) {
                     nodes[i].geometry = {"body":b[i],"header":null};//.slice();
                     that._addNode2NodeList(nodes[i]);
                 }
-                for (var i = 0; i < nodes.length; i++) {
+                for (i = 0; i < nodes.length; i++) {
                     if (nodes[i].hasOwnProperty('children')) {
-                        var bodyRect = nodes[i].geometry.body;
-                        var headerRect = nodes[i].geometry.header;
+                        bodyRect = nodes[i].geometry.body;
+                        headerRect = nodes[i].geometry.header;
                         // adjust bodyRect according to header height
-                        if (that._isRootNode(nodes[i]) == false && (bodyRect[3]-that.options.innerNodeHeaderHeight>0)) { // skips root node
+                        if (that._isRootNode(nodes[i]) === false && (bodyRect[3]-that.options.innerNodeHeaderHeight>0)) { // skips root node
                             headerRect = nodes[i].geometry.header = bodyRect.slice(); // init header rect with copy of body geometry
                             headerRect[3] = that.options.innerNodeHeaderHeight;
                             bodyRect[1] += that.options.innerNodeHeaderHeight;
                             bodyRect[3] -= that.options.innerNodeHeaderHeight;
                         }
                         // adjust bodyRect and headerRect according to border width
-                        if (that._isRootNode(nodes[i]) == false // skips root node
+                        if (that._isRootNode(nodes[i]) === false // skips root node
                             && (bodyRect[2]-that.options.nodeBorderWidth>0) 
                             && (bodyRect[3]-that.options.nodeBorderWidth>0)) {
                             if(that.options.dimensions[0] > bodyRect[0]+bodyRect[2]) {
                                 bodyRect[2] -= that.options.nodeBorderWidth;
-                                if (headerRect != null) headerRect[2] -= that.options.nodeBorderWidth;
+                                if (headerRect !== null) {
+                                    headerRect[2] -= that.options.nodeBorderWidth;
+                                }
                             }
                             if(that.options.dimensions[1] > bodyRect[1]+bodyRect[3]) {
                                 bodyRect[3] -= that.options.nodeBorderWidth;
@@ -462,7 +513,8 @@
                         processNodes(bodyRect,nodes[i].children,area,layoutMethod);
                     }
                 }
-            };
+            }
+
             var t0 = new Date();
             var that = this;
             var nodeCnt = 0;
@@ -476,7 +528,9 @@
 
         _getRgbColor: function(val) {
             //console.log(val);
-            if (val == null) return TreemapUtils.hex2rgb(this.options.naColor);
+            if (val === null) {
+                return TreemapUtils.hex2rgb(this.options.naColor);
+            }
             var map = this.options.colorGradientMap.data;
             var i = Math.floor(val*(map.length/4))*4;
             return [map[i],map[i+1],map[i+2]];
@@ -493,24 +547,35 @@
             if (this.scanLines === undefined) {
                 this.scanLines = [];
             }
-            y_str = parseInt(y);
+            y_str = parseInt(y, 10);
             if(!this.scanLines[y_str]){
                 this.scanLines[y_str] = [];
             }
-            this.scanLines[y_str].push(new Array(x1,x2,id));
+            this.scanLines[y_str].push([x1,x2,id]);
             //this.scanLines[y_str].unshift(new Array(x1,x2,id));
         },
 
         _coordsToId: function(x, y) {
-            if (this.scanLines === undefined) return [];
-            var runlengths = this.scanLines[y];
-            var ids = new Array();
+            var runlengths,
+                runlength,
+                xstart,
+                xend,
+                ids,
+                id,
+                i;
+
+            if (this.scanLines === undefined) {
+                return [];
+            }
+
+            runlengths = this.scanLines[y];
+            ids = [];
             if (runlengths) {
-                for (var i = runlengths.length-1; i >= 0; i--) {
-                    var runlength = runlengths[i];
-                    var xstart = runlength[0];
-                    var xend = runlength[1];
-                    var id = runlength[2];
+                for (i = runlengths.length-1; i >= 0; i--) {
+                    runlength = runlengths[i];
+                    xstart = runlength[0];
+                    xend = runlength[1];
+                    id = runlength[2];
                     if (xstart<=x && xend>x) {
                         ids.push(id);
                     }
@@ -541,8 +606,9 @@
         },
 
         _isRootNode: function(node) {
-            if (this.options.nodeData === node)
+            if (this.options.nodeData === node) {
                 return true;
+            }
             return false;
         },
 
@@ -564,7 +630,7 @@ var TreemapUtils = TreemapUtils || {};
 // sumArray is copied from: 
 // http://stackoverflow.com/questions/3762589/fastest-javascript-summation
 // 
-TreemapUtils.sumArray = function() {
+TreemapUtils.sumArray = (function() {
     // Use one adding function rather than create a new one each
     // time sumArray is called.
     function add(a,b) {
@@ -573,7 +639,7 @@ TreemapUtils.sumArray = function() {
     return function(arr) {
         return arr.reduce(add);
     };
-}();
+}());
 
 //
 // Color shifting algo from: http://stackoverflow.com/questions/1507931/generate-lighter-darker-color-in-css-using-javascript
@@ -617,15 +683,15 @@ TreemapUtils.changeColor = function(color, ratio, darker) {
             '(0|1|0?\\.\\d+))?' +
             '\\s*\\)$'
         , 'i')),
-        alpha = !!rgb && rgb[4] != null ? rgb[4] : null,
+        alpha = !!rgb && rgb[4] !== null ? rgb[4] : null,
 
         // Convert hex to decimal
         decimal = !!rgb? [rgb[1], rgb[2], rgb[3]] : color.replace(
             /^#?([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])/i,
-            function() {
-                return parseInt(arguments[1], 16) + ',' +
-                    parseInt(arguments[2], 16) + ',' +
-                    parseInt(arguments[3], 16);
+            function(x, a, b, c) {
+                return parseInt(a, 16) + ',' +
+                    parseInt(b, 16) + ',' +
+                    parseInt(c, 16);
             }
         ).split(/,/),
         returnValue;
@@ -680,10 +746,10 @@ TreemapUtils.hex2rgb = function(color) {
     // Convert hex to decimal
     return color.replace(
         /^#?([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])([a-f0-9][a-f0-9])/i,
-        function() {
-            return parseInt(arguments[1], 16) + ',' +
-                parseInt(arguments[2], 16) + ',' +
-                parseInt(arguments[3], 16);
+        function(x, a, b, c) {
+            return parseInt(a, 16) + ',' +
+                parseInt(b, 16) + ',' +
+                parseInt(c, 16);
         }
     ).split(/,/); // return array
 };
@@ -694,31 +760,33 @@ TreemapUtils.hex2rgb = function(color) {
 //trimming space from both side of the string
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g,"");
-}
+};
  
 //trimming space from left side of the string
 String.prototype.ltrim = function() {
     return this.replace(/^\s+/,"");
-}
+};
  
 //trimming space from right side of the string
 String.prototype.rtrim = function() {
     return this.replace(/\s+$/,"");
-}
+};
 
 //pads left
 String.prototype.lpad = function(padString, length) {
     var str = this;
-    while (str.length < length)
+    while (str.length < length) {
         str = padString + str;
+    }
     return str;
-}
+};
 
 //pads right
 String.prototype.rpad = function(padString, length) {
     var str = this;
-    while (str.length < length)
+    while (str.length < length) {
         str = str + padString;
+    }
     return str;
-}
+};
 
