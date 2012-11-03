@@ -343,6 +343,24 @@
                 initMouseoverboxFade(30000);
                 $("#mouseoverbox").show();
             };
+            var myInnerNodeHeaderLabeller = function(ctx,rect,rgb,id) {
+              ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+              ctx.clip();
+              ctx.fillStyle = '#555';
+              ctx.font = '0.625em Verdana, Geneva, sans-serif';
+              ctx.fillText(moboxAndLabelData[id].label,rect[0],rect[1]+10);
+            };
+            var myLeafNodeBodyLabeller = function(ctx,rect,rgb,id) {
+                ctx.rect(rect[0],rect[1],rect[2],rect[3]);
+                ctx.clip();
+                if (TreemapUtils.avgRgb(rgb) <= 200) {
+                    ctx.fillStyle = '#fff';
+                } else {
+                    ctx.fillStyle = '#888';
+                }
+                ctx.font = '0.625em Verdana, Geneva, sans-serif';
+                ctx.fillText(moboxAndLabelData[id].label,rect[0],rect[1]+10);
+            };
             var init = function(){
                 var treemapActive = false;
                 var createTreemap = function() {
@@ -352,6 +370,8 @@
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap({
                         "dimensions":[900,300],
+                        "innerNodeHeaderLabeller": myInnerNodeHeaderLabeller,
+                        "leafNodeBodyLabeller": myLeafNodeBodyLabeller,
                         "nodeBorderWidth":1,
                         "nodeData": {
                             "id":"2fc414e2", "size":[1.0], "color":[1.0], "children":[
