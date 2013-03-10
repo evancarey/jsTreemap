@@ -476,7 +476,11 @@
                 });
 
                 for (i = 0; i < nodes.length; i++) {
-                    a[i]=nodes[i].size[that.options.sizeOption]*area;
+                    if (that._isRootNode(nodes[i]) === true) {
+                      a[i] = area;
+                    } else {
+                      a[i]=nodes[i].size[that.options.sizeOption]*area;
+                    }
                 }
                 b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 nodeCnt += b.length;
