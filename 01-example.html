@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
+    </head>
+    <body>
+      <div id="treemap"></div>
+      <script type="text/javascript">
+            $(document).ready(function(){
+                $("#treemap").treemap({
+                    "nodeData": {
+                        "id":"2fc414e2", "children":[
+                            {"id":"node 1", "size":[.25], "color":[.74]},
+                            {"id":"node 2", "size":[.25], "color":[.98]},
+                            {"id":"node 3", "size":[.16667], "color":[.39]},
+                            {"id":"node 4", "size":[.125], "color":[.19]},
+                            {"id":"node 5", "size":[.083333], "color":[.52]},
+                            {"id":"node 6", "size":[.083333], "color":[.98]},
+                            {"id":"node 7", "size":[.041666667], "color":[.74]}
+                        ]
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
+

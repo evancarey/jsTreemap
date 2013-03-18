@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Evan Carey,
+ * Copyright (c) 2013 Evan Carey,
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
     $.widget( "ui.treemap", {
         // These options will be used as defaults
         options: {
-            // in future get dimensions from containing element maybe?
+            // TODO: use dimensions from containing element... if present?
             dimensions: [600,400],
             // default color gradient
             colorStops : [
@@ -312,22 +312,20 @@
                         for (j = 0; j < nodeRect[3]; j++) {
                             that._addRunlength(nodeRect[0],nodeRect[0]+nodeRect[2],(nodeRect[1]+j),nodes[i].id);
                         }
-                        nodeCnt++;
                     }
                     if (nodes[i].hasOwnProperty('children')) {
                         processNodes(nodes[i].children);
                     }
                 }
             };
-            var t0 = new Date();
             var that = this;
+            var t0 = new Date();
             var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
-            var nodeCnt = 0;
             that._clearScanLines();
             processNodes([that.options.nodeData]);
             var t1 = new Date();
-            console.log("Render Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
+            that.stats.renderLayoutMsec = (t1-t0);
         },
 
         _renderNodeLabels: function() {
@@ -367,18 +365,16 @@
                     if (nodes[i].hasOwnProperty('children')) {
                         processNodes(nodes[i].children);
                     }
-                    nodeCnt++;
                 }
             };
             // TODO: variable size based on node size | fixed size and position
-            var t0 = new Date();
             var that = this;
+            var t0 = new Date();
             var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
-            var nodeCnt = 0;
             processNodes([that.options.nodeData]);
             var t1 = new Date();
-            console.log("Render Node Labels: node count = " + nodeCnt + "; msec = " + (t1-t0));
+            that.stats.renderLabelsMsec = (t1-t0);
         },
 
         _refreshCanvas: function() {
@@ -483,7 +479,6 @@
                     }
                 }
                 b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
-                nodeCnt += b.length;
                 for (i = 0; i < nodes.length; i++) {
                     nodes[i].geometry = {"body":b[i],"header":null};//.slice();
                     that._addNode2NodeList(nodes[i]);
@@ -519,15 +514,14 @@
                 }
             }
 
-            var t0 = new Date();
             var that = this;
-            var nodeCnt = 0;
+            var t0 = new Date();
             var area = that.options.dimensions[0] * that.options.dimensions[1];
             var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
             that._clearNodeList();
             processNodes(rect,[that.options.nodeData],area,layoutMethod);
             var t1 = new Date();
-            console.log("Computing Layout: node count = " + nodeCnt + "; msec = " + (t1-t0));
+            that.stats.computeLayoutMsec = (t1-t0);
         },
 
         _getRgbColor: function(val) {
@@ -623,7 +617,9 @@
             // In jQuery UI 1.8, you must invoke the destroy method from the base widget
             $.Widget.prototype.destroy.call( this );
             // In jQuery UI 1.9 and above, you would define _destroy instead of destroy and not call the base method
-        }
+        },
+
+        stats: function() { return this.stats; }
     });
 
 }( jQuery ) );
