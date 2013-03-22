@@ -60,6 +60,7 @@
                 gradient.addColorStop(1,TreemapUtils.darkerColor(TreemapUtils.rgb2hex(rgb),0.2));
                 return gradient;
             },
+            layoutMethod: function() { return TreemapUtils.squarify; },
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
             colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
@@ -74,139 +75,6 @@
 
         _init: function() {
             this._refresh();
-        },
-
-        _squarify: function(rect,vals) {
-            //
-            // Non-recursive version of algorithm published in:
-            // "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
-            // http://www.win.tue.nl/~vanwijk/stm.pdf
-            //
-            // Includes tips and tricks from:
-            // http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
-            //
-            var Subrectangle = function(rect) {
-                this.setX = function(x) {
-                    rect[2] -= x - rect[0];
-                    rect[0] = x;
-                };
-                this.setY = function(y) {
-                    rect[3] -= y - rect[1];
-                    rect[1] = y;
-                };
-                this.getX = function() {
-                    return rect[0];
-                };
-                this.getY = function() {
-                    return rect[1];
-                };
-                this.getW = function() {
-                    return rect[2];
-                };
-                this.getH = function() {
-                    return rect[3];
-                };
-                this.getWidth = function() {
-                    return Math.min(rect[2],rect[3]);
-                };
-            };
-            //
-            // The function worst() gives the highest aspect ratio of a list 
-            // of rectangles, given the length of the side along which they are to
-            // be laid out.
-            // Let a list of areas R be given and let s be their total sum. Then the function worst is
-            // defined by:
-            // worst(R,w) = max(max(w^2r=s^2; s^2=(w^2r)))
-            //              for all r in R 
-            // Since one term is increasing in r and the other is decreasing, this is equal to
-            //              max(w^2r+=(s^2); s^2=(w^2r-))
-            // where r+ and r- are the maximum and minimum of R. 
-            // Hence, the current maximum and minimum of the row that is being laid out.
-            // 
-            var worst = function(r,w) {
-                var rMax = Math.max.apply(null,r);
-                var rMin = Math.min.apply(null,r);
-                var s = TreemapUtils.sumArray(r);
-                var sSqr = s*s;
-                var wSqr = w*w;
-                return Math.max((wSqr*rMax)/sSqr,sSqr/(wSqr*rMin));
-            };
-
-            // Take row of values and calculate the set of rectangles 
-            // that will fit in the current subrectangle.
-            var layoutrow = function(row) {
-                var x = subrect.getX(),
-                    y = subrect.getY(),
-                    maxX = x + subrect.getW(),
-                    maxY = y + subrect.getH(),
-                    rowHeight,
-                    i,
-                    w;
-
-                if (subrect.getW() < subrect.getH()) {
-                    rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getW());
-                    if (y+rowHeight >= maxY) { rowHeight = maxY-y; }
-                    for (i = 0; i < row.length; i++) {
-                        w = Math.ceil(row[i]/rowHeight);
-                        if (x+w > maxX || i+1 === row.length) { w = maxX-x; }
-                        layout.push([x,y,w,rowHeight]);
-                        x = (x+w);
-                    }
-                    subrect.setY(y+rowHeight);
-                } else {
-                    rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getH());
-                    if (x+rowHeight >= maxX) { rowHeight = maxX-x; }
-                    for (i = 0; i < row.length; i++) {
-                        w = Math.ceil(row[i]/rowHeight);
-                        if (y+w > maxY || i+1 === row.length) { w = maxY-y; }
-                        layout.push([x,y,rowHeight,w]);
-                        y = (y+w);
-                    }
-                    subrect.setX(x+rowHeight);
-                }
-            };
-
-            // Pull values from input array until the aspect ratio of rectangles in row
-            // under construction degrades.
-            var buildRow = function(children) {
-                var row = [];
-                row.push(children.shift()); // descending input
-                //row.push(children.pop()); // ascending input
-                if (children.length === 0) {
-                    return row;
-                }
-                var newRow = row.slice();
-                var w = subrect.getWidth();
-                do {
-                    newRow.push(children[0]); // descending input
-                    //newRow.push(children[children.length-1]); // ascending input
-                    if (worst(row,w) > worst(newRow,w)){
-                        row = newRow.slice();
-                        children.shift(); // descending input
-                        //children.pop(); // ascending input
-                    }
-                    else {
-                        break;
-                    }
-                } while (children.length > 0);
-                return row;
-            };
-
-            // Non recursive version of Bruls, Huizing and van Wijk
-            // squarify layout algorithim.
-            // While values exist in input array, make a row with good aspect
-            // ratios for its values then caclulate the row's geometry, repeat.
-            var nrSquarify = function(children) {
-                do {
-                    layoutrow(buildRow(children));
-                } while (children.length > 0);
-            };
-        
-            var row = [];
-            var layout = [];
-            var subrect = new Subrectangle(rect.slice());
-            nrSquarify(vals.slice());
-            return layout;
         },
 
         // Use the _setOption method to respond to changes to options
@@ -259,7 +127,7 @@
 
         _refresh: function() {
             this._refreshCanvas();
-            this._refreshLayout(this._squarify);
+            this._refreshLayout();
             this._refreshColorGradient();
             this._renderNodes();
             this._renderNodeLabels();
@@ -453,8 +321,8 @@
             this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorResolution,1);
         },
 
-        _refreshLayout: function(layoutMethod) {
-            function processNodes(rect,nodes,area,layoutMethod) {
+        _refreshLayout: function() {
+            function processNodes(rect,nodes,area) { 
                 var a = [],
                     bodyRect,
                     headerRect,
@@ -473,12 +341,14 @@
 
                 for (i = 0; i < nodes.length; i++) {
                     if (that._isRootNode(nodes[i]) === true) {
-                      a[i] = area;
+                      //a[i] = area;
+                      a[i] = 1.0;
                     } else {
-                      a[i]=nodes[i].size[that.options.sizeOption]*area;
+                      //a[i]=nodes[i].size[that.options.sizeOption]*area;
+                      a[i]=nodes[i].size[that.options.sizeOption];
                     }
                 }
-                b = layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
+                b = that.options.layoutMethod()([rect[0],rect[1],rect[2],rect[3]],a);
                 for (i = 0; i < nodes.length; i++) {
                     nodes[i].geometry = {"body":b[i],"header":null};//.slice();
                     that._addNode2NodeList(nodes[i]);
@@ -509,7 +379,7 @@
                             }
                         }
                         area = bodyRect[2]*bodyRect[3];
-                        processNodes(bodyRect,nodes[i].children,area,layoutMethod);
+                        processNodes(bodyRect,nodes[i].children,area);
                     }
                 }
             }
@@ -519,7 +389,7 @@
             var area = that.options.dimensions[0] * that.options.dimensions[1];
             var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
             that._clearNodeList();
-            processNodes(rect,[that.options.nodeData],area,layoutMethod);
+            processNodes(rect,[that.options.nodeData],area);
             var t1 = new Date();
             that.stats.computeLayoutMsec = (t1-t0);
         },
@@ -752,6 +622,142 @@ TreemapUtils.hex2rgb = function(color) {
                 parseInt(c, 16);
         }
     ).split(/,/); // return array
+};
+
+TreemapUtils.squarify = function(rect,vals) {
+    //
+    // Non-recursive version of algorithm published in:
+    // "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
+    // http://www.win.tue.nl/~vanwijk/stm.pdf
+    //
+    // Includes tips and tricks from:
+    // http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
+    //
+    var Subrectangle = function(rect) {
+        this.setX = function(x) {
+            rect[2] -= x - rect[0];
+            rect[0] = x;
+        };
+        this.setY = function(y) {
+            rect[3] -= y - rect[1];
+            rect[1] = y;
+        };
+        this.getX = function() {
+            return rect[0];
+        };
+        this.getY = function() {
+            return rect[1];
+        };
+        this.getW = function() {
+            return rect[2];
+        };
+        this.getH = function() {
+            return rect[3];
+        };
+        this.getWidth = function() {
+            return Math.min(rect[2],rect[3]);
+        };
+    };
+    //
+    // The function worst() gives the highest aspect ratio of a list 
+    // of rectangles, given the length of the side along which they are to
+    // be laid out.
+    // Let a list of areas R be given and let s be their total sum. Then the function worst is
+    // defined by:
+    // worst(R,w) = max(max(w^2r=s^2; s^2=(w^2r)))
+    //              for all r in R 
+    // Since one term is increasing in r and the other is decreasing, this is equal to
+    //              max(w^2r+=(s^2); s^2=(w^2r-))
+    // where r+ and r- are the maximum and minimum of R. 
+    // Hence, the current maximum and minimum of the row that is being laid out.
+    // 
+    var worst = function(r,w) {
+        var rMax = Math.max.apply(null,r);
+        var rMin = Math.min.apply(null,r);
+        var s = TreemapUtils.sumArray(r);
+        var sSqr = s*s;
+        var wSqr = w*w;
+        return Math.max((wSqr*rMax)/sSqr,sSqr/(wSqr*rMin));
+    };
+
+    // Take row of values and calculate the set of rectangles 
+    // that will fit in the current subrectangle.
+    var layoutrow = function(row) {
+        var x = subrect.getX(),
+            y = subrect.getY(),
+            maxX = x + subrect.getW(),
+            maxY = y + subrect.getH(),
+            rowHeight,
+            i,
+            w;
+
+        if (subrect.getW() < subrect.getH()) {
+            rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getW());
+            if (y+rowHeight >= maxY) { rowHeight = maxY-y; }
+            for (i = 0; i < row.length; i++) {
+                w = Math.ceil(row[i]/rowHeight);
+                if (x+w > maxX || i+1 === row.length) { w = maxX-x; }
+                layout.push([x,y,w,rowHeight]);
+                x = (x+w);
+            }
+            subrect.setY(y+rowHeight);
+        } else {
+            rowHeight = Math.ceil(TreemapUtils.sumArray(row)/subrect.getH());
+            if (x+rowHeight >= maxX) { rowHeight = maxX-x; }
+            for (i = 0; i < row.length; i++) {
+                w = Math.ceil(row[i]/rowHeight);
+                if (y+w > maxY || i+1 === row.length) { w = maxY-y; }
+                layout.push([x,y,rowHeight,w]);
+                y = (y+w);
+            }
+            subrect.setX(x+rowHeight);
+        }
+    };
+
+    // Pull values from input array until the aspect ratio of rectangles in row
+    // under construction degrades.
+    var buildRow = function(children) {
+        var row = [];
+        row.push(children.shift()); // descending input
+        //row.push(children.pop()); // ascending input
+        if (children.length === 0) {
+            return row;
+        }
+        var newRow = row.slice();
+        var w = subrect.getWidth();
+        do {
+            newRow.push(children[0]); // descending input
+            //newRow.push(children[children.length-1]); // ascending input
+            if (worst(row,w) > worst(newRow,w)){
+                row = newRow.slice();
+                children.shift(); // descending input
+                //children.pop(); // ascending input
+            }
+            else {
+                break;
+            }
+        } while (children.length > 0);
+        return row;
+    };
+
+    // Non recursive version of Bruls, Huizing and van Wijk
+    // squarify layout algorithim.
+    // While values exist in input array, make a row with good aspect
+    // ratios for its values then caclulate the row's geometry, repeat.
+    var nrSquarify = function(children) {
+        do {
+            layoutrow(buildRow(children));
+        } while (children.length > 0);
+    };
+
+    var row = [];
+    var layout = [];
+    var newVals = [];
+    // vals come in normalized. convert them here to make them relative to containing rect
+    newVals = vals.map(function(item){return item*(rect[2]*rect[3]);}); 
+    var subrect = new Subrectangle(rect.slice());
+    nrSquarify(newVals);
+    return layout;
 };
 
 //
