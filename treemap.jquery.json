@@ -2,7 +2,7 @@
   "name":"treemap",
   "title":"jQuery Treemap",
   "description":"jQuery plugin for creating squarified treemap of hierarchical data using HTML5 canvas",
-  "version":"0.4.2",
+  "version":"0.5.0",
   "author":{
     "name":"Evan Carey",
     "email":"carey.evan@gmail.com"
