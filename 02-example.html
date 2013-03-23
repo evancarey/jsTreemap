@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
+        <style type="text/css">
+            .groupSizeColorSelector {
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="groupSizeColorSelector" id="sizeBySelector">
+            <p><span style="color:#777">Size By:</span>
+                <select id="sizeBy">
+                    <option value="0"><b>Area</b></option>
+                    <option value="1" selected=selected><b>Population</b></option>
+                    <option value="2"><b>Life Expectancy</b></option>
+                    <option value="3"><b>Infant Mortality</b></option>
+                </select>
+            </p>
+        </div>
+        <div id="treemap"></div>
+	      <script type="text/javascript">
+            var init = function(){
+                var createTreemap = function() {
+                    $("#treemap").treemap({
+                        "dimensions":[900,300],
+                        "sizeOption":1,
+                        "nodeData": {
+                            "id":"2fc414e2", "children":[
+                                {"id":"node 1", "size":[.25,.7078533757055014,.08038695496678606,.1798013810278924], "color":[.74]},
+                                {"id":"node 2", "size":[.25,.04716253184550722,.11885651163331237,.21906028099441757], "color":[.98]},
+                                {"id":"node 3", "size":[.16667,.06122787130028486,.22720306420190928,.13172295366450237], "color":[.39]},
+                                {"id":"node 4", "size":[.125,.030236144312274546,.13194188815903038,.22872719830190025], "color":[.19]},
+                                {"id":"node 5", "size":[.083333,.13627056790452963,.19140993988513774,.008958104928028555], "color":[.52]},
+                                {"id":"node 6", "size":[.083333,.008355967011586606,.12493818313339286,.15427971304890944], "color":[.98]},
+                                {"id":"node 7", "size":[.041666667,.00889354192031559,.12526345802043118,.07745036803434943], "color":[.74]}
+                            ]
+                        }
+                    });
+                };
+                $("#sizeBy").change(function(){
+                    $("#treemap").unbind().treemap("option","sizeOption",$("#sizeBy option:selected").val())
+                });
+                createTreemap();   
+            };
+            $(document).ready(function(){
+                init();
+            });
+        </script>
+    </body>
+</html>
+
