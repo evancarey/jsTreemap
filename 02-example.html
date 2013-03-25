@@ -6,28 +6,34 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <style type="text/css">
-            .groupSizeColorSelector {
+            div {
+                font: 0.7em Verdana, Geneva, sans-serif;
+            }
+            .sizeByOptionLabel {
                 display: inline-block;
+                color: #aaa;
+            }
+            .sizeByOption {
+                display: inline-block;
+                border: 1px solid #ccc;
+                padding: 0px 10px 0px 10px;
+                margin: 0px 0px 0px 0px;
+                color: #666;
             }
         </style>
     </head>
     <body>
-        <div class="groupSizeColorSelector" id="sizeBySelector">
-            <p><span style="color:#777">Size By:</span>
-                <select id="sizeBy">
-                    <option value="0"><b>Area</b></option>
-                    <option value="1" selected=selected><b>Population</b></option>
-                    <option value="2"><b>Life Expectancy</b></option>
-                    <option value="3"><b>Infant Mortality</b></option>
-                </select>
-            </p>
-        </div>
+        <div class="sizeByOptionLabel">Size By:</div>
+        <div class="sizeByOption" id="sizeBy0">Area</div>
+        <div class="sizeByOption" id="sizeBy1" style="background-color:#ddd">Population</div>
+        <div class="sizeByOption" id="sizeBy2">Life Expectancy</div>
+        <div class="sizeByOption" id="sizeBy3">Infant Mortality</div>
         <div id="treemap"></div>
 	      <script type="text/javascript">
             var init = function(){
                 var createTreemap = function() {
                     $("#treemap").treemap({
-                        "dimensions":[900,300],
+                        "dimensions":[900,400],
                         "sizeOption":1,
                         "nodeData": {
                             "id":"2fc414e2", "children":[
@@ -42,8 +48,10 @@
                         }
                     });
                 };
-                $("#sizeBy").change(function(){
-                    $("#treemap").unbind().treemap("option","sizeOption",$("#sizeBy option:selected").val())
+                $(".sizeByOption").mouseenter(function(){
+                    $(".sizeByOption").css("background-color","");
+                    $(this).css("background-color","#ddd");
+                    $("#treemap").unbind().treemap("option","sizeOption",$(this).attr("id").match(/[0-9]+/));
                 });
                 createTreemap();   
             };
