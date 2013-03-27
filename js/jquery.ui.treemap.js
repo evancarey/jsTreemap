@@ -30,6 +30,28 @@ TreemapUtils.sumArray = (function() {
 }());
 
 //
+// deepCopy is copied from:
+// http://james.padolsey.com/javascript/deep-copying-of-objects-and-arrays/
+//
+TreemapUtils.deepCopy = function(obj) {
+    if (Object.prototype.toString.call(obj) === '[object Array]') {
+        var out = [], i = 0, len = obj.length;
+        for ( ; i < len; i++ ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    if (typeof obj === 'object') {
+        var out = {}, i;
+        for ( i in obj ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    return obj;
+};
+
+//
 // Color shifting algo from: http://stackoverflow.com/questions/1507931/generate-lighter-darker-color-in-css-using-javascript
 // 
 // Modified to use the lpad function defined below.
