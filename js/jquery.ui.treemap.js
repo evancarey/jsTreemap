@@ -456,12 +456,16 @@ TreemapUtils.squarify = function(rect,vals) {
         _animate: function() {
             if ( this.options.animationEnabled == true ) {
                 (function() {
-                    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+                    var requestAnimationFrame = window.requestAnimationFrame 
+                        || window.mozRequestAnimationFrame 
+                        || window.webkitRequestAnimationFrame 
+                        || window.msRequestAnimationFrame
+                        || function( callback ){ window.setTimeout(callback, 1000 / 60); };
                     window.requestAnimationFrame = requestAnimationFrame;
                 })();
                 var start = Date.now();
                 function step(timestamp) {
+                    var timestamp = Date.now(); // FIXME: hack- webkit is returning something else
                     var progress = timestamp - start;
                     //console.log("progress = "+progress);
                     if ( progress < that.options.animationDuration) {
