@@ -503,15 +503,14 @@ TreemapUtils.squarify = function(rect,vals) {
                             continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         }
                         for ( j = 0; j < 4; j++ ) {
-                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - sourceBodyRect[j])*percent;
+                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - sourceBodyRect[j]) * percent;
                         }
                         rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                         ctx.save();
                         ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,sourceBodyRect,rgb);
                         ctx.fillRect(sourceBodyRect[0],sourceBodyRect[1],sourceBodyRect[2],sourceBodyRect[3]);
                         ctx.restore();
-                    }
-                    if (nodes[i].hasOwnProperty('children')) {
+                    } else {
                         processNodes(nodes[i].children);
                     }
                 }
