@@ -721,14 +721,13 @@ TreemapUtils.squarify = function(rect,vals) {
         // nodeList is internal index into nodeData nodes
         _clearNodeList: function() {
             if (this.nodeList) {
-                this.nodeList.length = 0;
-                this.nodeList = [];
+                this.nodeList = {};
             }
         },
 
         _addNode2NodeList: function(node) {
             if (this.nodeList === undefined) {
-                this.nodeList = [];
+                this.nodeList = {};
             }
             if (!this.nodeList[node.id]) {
                 this.nodeList[node.id] = node;
