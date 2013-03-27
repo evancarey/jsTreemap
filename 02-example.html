@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
     <head>
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.9.1/build/cssreset/cssreset-min.css">
         <meta charset="utf-8"/>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
@@ -23,18 +24,20 @@
         </style>
     </head>
     <body>
+        <div id="sizeByOptions">
         <div class="sizeByOptionLabel">Size By:</div>
         <div class="sizeByOption" id="sizeBy0">Area</div>
         <div class="sizeByOption" id="sizeBy1" style="background-color:#ddd">Population</div>
         <div class="sizeByOption" id="sizeBy2">Life Expectancy</div>
         <div class="sizeByOption" id="sizeBy3">Infant Mortality</div>
+        </div>
         <div id="treemap"></div>
         <script type="text/javascript">
             var currSizeOption = 1;
             var init = function(){
                 var createTreemap = function() {
                     $("#treemap").treemap({
-                        "dimensions":[900,400],
+                        "dimensions":[$(document).width(),$(document).height()-$("#sizeByOptions").height()],
                         "sizeOption":1,
                         "labelsEnabled":true,
                         "animationEnabled":true,
