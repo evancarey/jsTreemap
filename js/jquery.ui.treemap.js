@@ -362,17 +362,26 @@ TreemapUtils.squarify = function(rect,vals) {
             sizeOption: 0, // index into size attribute of this.options.nodeData elements
             colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
-            enableLabels: true,
+            labelsEnabled: false, // boolean flag indicating whether or not to call node labeller methods
+            animationEnabled: false, // boolean flag indicating whether or not animate size option changes
+            animationDuration: 1000, // millisec duration of size transition animation
             nodeData: {}
         },  
 
         // Set up the widget
         _create: function() {
-            //this._refresh();
+            // create is called once per instance
+            //console.log("_create was called");
         },
 
         _init: function() {
-            this._refresh();
+            // init is called each time widget is called w/o arguments 
+            //console.log("_init was called");
+            this._refreshCanvas();
+            this._refreshLayout();
+            this._refreshColorGradient();
+            this._renderNodes();
+            this._renderNodeLabels();
         },
 
         // Use the _setOption method to respond to changes to options
@@ -381,14 +390,19 @@ TreemapUtils.squarify = function(rect,vals) {
             switch (option) {  
                 case "dimensions":
                     this.options.dimensions = value;
-                    this._refresh();
+                    this._refreshCanvas();
+                    this._refreshLayout();
+                    this._renderNodes();
+                    this._renderNodeLabels();
                     break;
                 case "layoutMethod":
                     this.options.layoutMethod = value;
-                    this._refresh();
+                    this._refreshLayout();
+                    this._renderNodes();
+                    this._renderNodeLabels();
                     break;
-                case "enableLabels":
-                    this.options.enableLabels = value;
+                case "labelsEnabled":
+                    this.options.labelsEnabled = value;
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
@@ -418,21 +432,91 @@ TreemapUtils.squarify = function(rect,vals) {
                     break;
                 case "sizeOption":
                     this.options.sizeOption = value;
-                    this._refresh();
+                    //this._refreshCanvas();
+                    this._refreshLayout();
+                    //this._renderNodes();
+                    //this._renderNodeLabels();
+                    this._animate();
                     break;
                 case "nodeData":
                     this.options.nodeData = value;
-                    this._refresh();
+                    this._refreshLayout();
+                    this._renderNodes();
+                    this._renderNodeLabels();
+                    break;
+                case "animationEnabled":
+                    this.options.animationEnabled = value;
+                    break;
+                case "animationDuration":
+                    this.options.animationDuration = value;
                     break;
             }  
         },
 
-        _refresh: function() {
-            this._refreshCanvas();
-            this._refreshLayout();
-            this._refreshColorGradient();
-            this._renderNodes();
-            this._renderNodeLabels();
+        _animate: function() {
+            if ( this.options.animationEnabled == true ) {
+                (function() {
+                    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+                    window.requestAnimationFrame = requestAnimationFrame;
+                })();
+                var start = Date.now();
+                function step(timestamp) {
+                    var progress = timestamp - start;
+                    //console.log("progress = "+progress);
+                    if ( progress < that.options.animationDuration) {
+                        that._animateNodes(progress/that.options.animationDuration);
+                        requestAnimationFrame(step);
+                    } else {
+                        that._renderNodes();
+                        that._renderNodeLabels();
+                    }
+                }
+                var that = this;
+                requestAnimationFrame(step);
+            } else {
+              this._renderNodes();
+              this._renderNodeLabels();
+            }
+        },
+
+        _animateNodes: function(percent) {
+            var processNodes = function(nodes) {
+                var sourceBodyRect,
+                    rgb,
+                    i,
+                    j;
+
+                for (i = 0; i < nodes.length; i++) {
+                    if ( nodes[i].hasOwnProperty('children') === false) { // leaf nodes only
+                        sourceBodyRect = nodes[i].prevGeometry.body.slice();
+                        if (isNaN(nodes[i].geometry.body[0]) 
+                            || isNaN(nodes[i].geometry.body[1]) 
+                            || isNaN(nodes[i].geometry.body[2]) 
+                            || isNaN(nodes[i].geometry.body[3]) 
+                            || nodes[i].geometry.body[2] === 0 
+                            || nodes[i].geometry.body[3] === 0) {
+                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        }
+                        for ( j = 0; j < 4; j++ ) {
+                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - sourceBodyRect[j])*percent;
+                        }
+                        rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
+                        ctx.save();
+                        ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,sourceBodyRect,rgb);
+                        ctx.fillRect(sourceBodyRect[0],sourceBodyRect[1],sourceBodyRect[2],sourceBodyRect[3]);
+                        ctx.restore();
+                    }
+                    if (nodes[i].hasOwnProperty('children')) {
+                        processNodes(nodes[i].children);
+                    }
+                }
+            };
+            var that = this;
+            var canvas = that.element.find("canvas")[0];
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            processNodes([that.options.nodeData]);
         },
 
         _renderNodes: function() {
@@ -492,6 +576,7 @@ TreemapUtils.squarify = function(rect,vals) {
             var t0 = new Date();
             var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             that._clearScanLines();
             processNodes([that.options.nodeData]);
             var t1 = new Date();
@@ -499,7 +584,7 @@ TreemapUtils.squarify = function(rect,vals) {
         },
 
         _renderNodeLabels: function() {
-            if (this.options.enableLabels !== true) {
+            if (this.options.labelsEnabled !== true) {
                 return;
             }
 
@@ -650,7 +735,10 @@ TreemapUtils.squarify = function(rect,vals) {
                 }
                 b = that.options.layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 for (i = 0; i < nodes.length; i++) {
-                    nodes[i].geometry = {"body":b[i],"header":null};//.slice();
+                    if (nodes[i].geometry) {
+                        nodes[i].prevGeometry = TreemapUtils.deepCopy(nodes[i].geometry);
+                    }
+                    nodes[i].geometry = {"body":b[i],"header":null};
                     that._addNode2NodeList(nodes[i]);
                 }
                 for (i = 0; i < nodes.length; i++) {
