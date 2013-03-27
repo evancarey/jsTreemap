@@ -9,6 +9,9 @@
  *    Evan Carey - initial API and implementation and initial documentation
  *******************************************************************************/ 
 
+//
+// Treemap utilities
+//
 var TreemapUtils = TreemapUtils || {};
 
 //
@@ -139,15 +142,19 @@ TreemapUtils.hex2rgb = function(color) {
     ).split(/,/); // return array
 };
 
+//
+// Treemap squarify layout function.
+//  rect - containing rectangle; an array of 4 values x, y, width, height
+//  vals - array of (normalized) float values each representing percent contribution to total area of containing rectangle
+//
+// Non-recursive implementation of the squarify treemap layout algorithm published in:
+// "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
+// http://www.win.tue.nl/~vanwijk/stm.pdf
+//
+// Includes tips and tricks from:
+// http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
+//
 TreemapUtils.squarify = function(rect,vals) {
-    //
-    // Non-recursive version of algorithm published in:
-    // "Squarified Treemaps" by Mark Bruls, Kees Huizing and Jarke J. van Wijk
-    // http://www.win.tue.nl/~vanwijk/stm.pdf
-    //
-    // Includes tips and tricks from:
-    // http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
-    //
     var Subrectangle = function(rect) {
         this.setX = function(x) {
             rect[2] -= x - rect[0];
@@ -275,6 +282,9 @@ TreemapUtils.squarify = function(rect,vals) {
     return layout;
 };
 
+//
+// jQuery treemap widget
+//
 (function( $ ) {
     $.widget( "ui.treemap", {
         // These options will be used as defaults
