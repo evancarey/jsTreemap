@@ -259,7 +259,11 @@
     };</pre></div>
     <p>Easing convenience object members can be applied like so:</p>
     <div class="codeDiv"><pre>
-    $("#treemap").treemap({"animationEasing":TreemapUtils.Easing["ease-in-out"]});
+    $("#treemap").treemap({
+        ...
+        "animationEasing":TreemapUtils.Easing["ease-in-out"],
+        ...
+    });
     </pre></div>
                     <h4>Events</h4>
                     <h5>treemapmousemove</h5>
