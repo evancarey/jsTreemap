@@ -6,7 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Evan Carey - initial API and implementation and initial documentation
+ *    Evan Carey
+ *    Bryan Grohman
  *******************************************************************************/ 
 
 //
