@@ -14,6 +14,67 @@
 //
 var TreemapUtils = TreemapUtils || {};
 
+/**
+* KeySpline - use bezier curve for transition easing function
+* is inspired from Firefox's nsSMILKeySpline.cpp
+* Usage:
+* var spline = new KeySpline(0.25, 0.1, 0.25, 1.0)
+* spline.get(x) => returns the easing value | x must be in [0, 1] range
+*
+* From: http://blog.greweb.fr/2012/02/bezier-curve-based-easing-functions-from-concept-to-implementation/
+* Author: Gaëtan Renaudeau
+*/
+/**
+* Evan Carey: Modified to accept options object as argument
+*/
+TreemapUtils.KeySpline = function (options) {
+
+  // defaults to linear easing
+  var mX1 = options.mX1 || 0.00;
+  var mY1 = options.mY1 || 0.0;
+  var mX2 = options.mX2 || 1.00;
+  var mY2 = options.mY2 || 1.0;
+
+  this.get = function(aX) {
+    if (mX1 == mY1 && mX2 == mY2) return aX; // linear
+    return CalcBezier(GetTForX(aX), mY1, mY2);
+  }
+
+  function A(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
+  function B(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
+  function C(aA1)      { return 3.0 * aA1; }
+
+  // Returns x(t) given t, x1, and x2, or y(t) given t, y1, and y2.
+  function CalcBezier(aT, aA1, aA2) {
+    return ((A(aA1, aA2)*aT + B(aA1, aA2))*aT + C(aA1))*aT;
+  }
+
+  // Returns dx/dt given t, x1, and x2, or dy/dt given t, y1, and y2.
+  function GetSlope(aT, aA1, aA2) {
+    return 3.0 * A(aA1, aA2)*aT*aT + 2.0 * B(aA1, aA2) * aT + C(aA1);
+  }
+
+  function GetTForX(aX) {
+    // Newton raphson iteration
+    var aGuessT = aX;
+    for (var i = 0; i < 4; ++i) {
+      var currentSlope = GetSlope(aGuessT, mX1, mX2);
+      if (currentSlope == 0.0) return aGuessT;
+      var currentX = CalcBezier(aGuessT, mX1, mX2) - aX;
+      aGuessT -= currentX / currentSlope;
+    }
+    return aGuessT;
+  }
+};
+
+TreemapUtils.Easing = {
+    "ease":        {mX1 : 0.25, mY1 : 0.1, mX2 : 0.25, mY2 : 1.0}, 
+    "linear":      {mX1 : 0.00, mY1 : 0.0, mX2 : 1.00, mY2 : 1.0},
+    "ease-in":     {mX1 : 0.42, mY1 : 0.0, mX2 : 1.00, mY2 : 1.0},
+    "ease-out":    {mX1 : 0.00, mY1 : 0.0, mX2 : 0.58, mY2 : 1.0},
+    "ease-in-out": {mX1 : 0.42, mY1 : 0.0, mX2 : 0.58, mY2 : 1.0}
+};
+
 //
 // sumArray is copied from: 
 // http://stackoverflow.com/questions/3762589/fastest-javascript-summation
@@ -365,6 +426,7 @@ TreemapUtils.squarify = function(rect,vals) {
             labelsEnabled: false, // boolean flag indicating whether or not to call node labeller methods
             animationEnabled: false, // boolean flag indicating whether or not animate size option changes
             animationDuration: 1000, // millisec duration of size transition animation
+            animationEasing: {}, // defaults to linear
             nodeData: {}
         },  
 
@@ -463,13 +525,14 @@ TreemapUtils.squarify = function(rect,vals) {
                         || function( callback ){ window.setTimeout(callback, 1000 / 60); };
                     window.requestAnimationFrame = requestAnimationFrame;
                 })();
+                var spline = new TreemapUtils.KeySpline(this.options.animationEasing);
                 var start = Date.now();
                 function step(timestamp) {
                     var timestamp = Date.now(); // FIXME: hack- webkit is returning something else
                     var progress = timestamp - start;
                     //console.log("progress = "+progress);
                     if ( progress < that.options.animationDuration) {
-                        that._animateNodes(progress/that.options.animationDuration);
+                        that._animateNodes(spline.get(progress/that.options.animationDuration));
                         requestAnimationFrame(step);
                     } else {
                         that._renderNodes();
