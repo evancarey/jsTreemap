@@ -230,6 +230,37 @@
     <p>Default:</p>
     <div class="codeDiv"><pre>
     labelsEnabled: true</pre></div>
+                        <h5>animationEnabled</h5>
+                        <p>Boolean flag indicating whether or not to animate size option changes.</p>
+    <p>Default:</p>
+    <div class="codeDiv"><pre>
+    animationEnabled: false</pre></div>
+                        <h5>animationDuration</h5>
+                        <p>Millisecond duration of size transition animation.</p>
+    <p>Default:</p>
+    <div class="codeDiv"><pre>
+    animationDuration: 1000</pre></div>
+                        <h5>animationEasing</h5>
+                        <p>Object containing input parameters to a Bezier curve function.  Resultant curve is used to compute percent completion of animation.</p>
+    <p>Default:</p>
+    <div class="codeDiv"><pre>
+    animationEasing: {} // linear easing</pre></div>
+    <p>Example:</p>
+    <div class="codeDiv"><pre>
+    animationEasing: {mX1 : 0.42, mY1 : 0.0, mX2 : 0.58, mY2 : 1.0} // ease-in-out</pre></div>
+    <p>Easing convenience object:</p>
+    <div class="codeDiv"><pre>
+    TreemapUtils.Easing = {
+        "ease":        {mX1 : 0.25, mY1 : 0.1, mX2 : 0.25, mY2 : 1.0}, 
+        "linear":      {mX1 : 0.00, mY1 : 0.0, mX2 : 1.00, mY2 : 1.0},
+        "ease-in":     {mX1 : 0.42, mY1 : 0.0, mX2 : 1.00, mY2 : 1.0},
+        "ease-out":    {mX1 : 0.00, mY1 : 0.0, mX2 : 0.58, mY2 : 1.0},
+        "ease-in-out": {mX1 : 0.42, mY1 : 0.0, mX2 : 0.58, mY2 : 1.0}
+    };</pre></div>
+    <p>Easing convenience object members can be applied like so:</p>
+    <div class="codeDiv"><pre>
+    $("#treemap").treemap({"animationEasing":TreemapUtils.Easing["ease-in-out"]});
+    </pre></div>
                     <h4>Events</h4>
                     <h5>treemapmousemove</h5>
                     <p>The treemapmousemove event can be used to trigger and update the presentation of a mouseover box and node highlighter(s) via a Javascript callback.  The mouseover box and highlighter(s) shown in this example are optional presentation elements and can be populated, styled using HTML and CSS.  The sample javascript code in this page demonstrates what information is available to the event handlers and how one might choose to highlight and/or display node details.</p>

@@ -424,7 +424,7 @@ TreemapUtils.squarify = function(rect,vals) {
             colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
             labelsEnabled: false, // boolean flag indicating whether or not to call node labeller methods
-            animationEnabled: false, // boolean flag indicating whether or not animate size option changes
+            animationEnabled: false, // boolean flag indicating whether or not to animate size option changes
             animationDuration: 1000, // millisec duration of size transition animation
             animationEasing: {}, // defaults to linear
             nodeData: {}
