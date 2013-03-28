@@ -503,7 +503,7 @@ TreemapUtils.squarify = function(rect,vals) {
                             continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         }
                         for ( j = 0; j < 4; j++ ) {
-                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - sourceBodyRect[j]) * percent;
+                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - nodes[i].prevGeometry.body[j]) * percent;
                         }
                         rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                         ctx.save();
