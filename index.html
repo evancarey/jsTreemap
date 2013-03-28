@@ -11,6 +11,17 @@
             body {
                 font: 0.75em Verdana, Geneva, sans-serif;
             }
+            .sizeByOptionLabel {
+                display: inline-block;
+                color: #aaa;
+            }
+            .sizeByOption {
+                display: inline-block;
+                border: 1px solid #ccc;
+                padding: 0px 10px 0px 10px;
+                margin: 0px 0px 0px 0px;
+                color: #666;
+            }
             #content { margin-right: auto; margin-left: auto; width: 900px; }
             canvas { border: 1px solid #f00; }
             #treemap { display: inline-block; }
@@ -55,6 +66,13 @@
                     <input id="t9" type="checkbox" checked="checked"/>
                     <label for="t9">labels</label>
                     <div><span id="treemap"></span></div>
+                    <div id="sizeByOptions">
+                    <div class="sizeByOptionLabel">Size By:</div>
+                    <div class="sizeByOption" id="sizeBy0">Area</div>
+                    <div class="sizeByOption" id="sizeBy1" style="background-color:#ddd">Population</div>
+                    <div class="sizeByOption" id="sizeBy2">Life Expectancy</div>
+                    <div class="sizeByOption" id="sizeBy3">Infant Mortality</div>
+                    </div>
                     <div id="debug-info"><span><p>Click the 'create' button to create example treemap</p></span></div>
                     <div id="highlighter"></div>
                     <div id="mouseoverbox" class="mouseoverbox"></div>
@@ -406,19 +424,37 @@
                 ctx.font = '0.625em Verdana, Geneva, sans-serif';
                 ctx.fillText(moboxAndLabelData[id].label,rect[0],rect[1]+10);
             };
+            var currSizeOption = 1;
+            var initSizeBySelector = function() {
+                currSizeOption = 1; // reset size by option
+                $(".sizeByOption").css("background-color","");
+                $("#sizeBy1").css("background-color","#ddd");
+            };
+            var sizeByHandler = function(testSizeOption) {
+                if (testSizeOption == currSizeOption) return;
+                $(".sizeByOption").css("background-color","");
+                $("#sizeBy"+testSizeOption).css("background-color","#ddd");
+                $("#treemap").treemap("option","sizeOption",testSizeOption);
+                currSizeOption = testSizeOption;
+            };
             var init = function(){
                 var treemapActive = false;
                 var createTreemap = function() {
                     if (treemapActive == true) return;
                     treemapActive = true;
+                    initSizeBySelector();
                     $("#t9").attr('checked','checked');
                     $("#debug-info").html("<span><p>0,0</p></span>");
                     $("#treemap").treemap({
                         "dimensions":[900,300],
+                        "sizeOption":1,
                         "innerNodeHeaderLabeller": myInnerNodeHeaderLabeller,
                         "leafNodeBodyLabeller": myLeafNodeBodyLabeller,
                         "labelsEnabled":true,
                         "nodeBorderWidth":1,
+                        "animationEnabled":true,
+                        "animationDuration":2000,
+                        "animationEasing":TreemapUtils.Easing["ease-in-out"],
                         "nodeData": {
                             "id":"2fc414e2", "children":[
                                 {"id":"23f627dc", "size":[.25,.7078533757055014,.08038695496678606,.1798013810278924], "color":[.39], "children":[
@@ -568,6 +604,9 @@
                 });
                 $("#t9").click(function(){
                     $("#treemap").treemap("option","labelsEnabled",$(this).is(':checked'));
+                });
+                $(".sizeByOption").mouseenter(function(){
+                    sizeByHandler($(this).attr("id").match(/[0-9]+/)[0]);
                 });
                 createTreemap();   
             };
