@@ -561,10 +561,8 @@ TreemapUtils.squarify = function(rect,vals) {
                         if (isNaN(nodes[i].geometry.body[0]) 
                             || isNaN(nodes[i].geometry.body[1]) 
                             || isNaN(nodes[i].geometry.body[2]) 
-                            || isNaN(nodes[i].geometry.body[3]) 
-                            || nodes[i].geometry.body[2] === 0 
-                            || nodes[i].geometry.body[3] === 0) {
-                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                            || isNaN(nodes[i].geometry.body[3])) {
+                            continue; // TODO: track down why NaNs are showing up here
                         }
                         for ( j = 0; j < 4; j++ ) {
                           sourceBodyRect[j] += (nodes[i].geometry.body[j] - nodes[i].prevGeometry.body[j]) * percent;
