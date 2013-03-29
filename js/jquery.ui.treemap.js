@@ -523,6 +523,7 @@ TreemapUtils.squarify = function(rect,vals) {
                         || function( callback ){ window.setTimeout(callback, 1000 / 60); };
                     window.requestAnimationFrame = requestAnimationFrame;
                 })();
+                this._animationActive = true;
                 var spline = new TreemapUtils.KeySpline(this.options.animationEasing);
                 var start = Date.now();
                 function step(timestamp) {
@@ -535,6 +536,7 @@ TreemapUtils.squarify = function(rect,vals) {
                     } else {
                         that._renderNodes();
                         that._renderNodeLabels();
+                        that._animationActive = false;
                     }
                 }
                 var that = this;
@@ -704,6 +706,7 @@ TreemapUtils.squarify = function(rect,vals) {
             canvas.setAttribute("height",this.options.dimensions[1]);
             var that = this; // to pass this to event handler
             this.element.append(canvas).mousemove(function(e){
+                if ( that._animationActive !== undefined && that._animationActive === true ) return;
                 var offset = that.element.offset(),
                     offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
                     offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
@@ -724,6 +727,7 @@ TreemapUtils.squarify = function(rect,vals) {
                     that._trigger('mousemove',e,data);
                 }
             }).click(function(e){
+                if ( that._animationActive !== undefined && that._animationActive === true ) return;
                 var offset = that.element.offset(),
                     offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
                     offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
