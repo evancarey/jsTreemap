@@ -495,10 +495,7 @@ TreemapUtils.squarify = function(rect,vals) {
                     break;
                 case "sizeOption":
                     this.options.sizeOption = value;
-                    //this._refreshCanvas();
                     this._refreshLayout();
-                    //this._renderNodes();
-                    //this._renderNodeLabels();
                     this._animate();
                     break;
                 case "nodeData":
