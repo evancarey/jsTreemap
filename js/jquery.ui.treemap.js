@@ -383,7 +383,7 @@ TreemapUtils.squarify = function(rect,vals) {
             ],
             colorResolution: 1024,
             naColor: "#000",
-            innerNodeHeaderHeight: 12,
+            innerNodeHeaderHeightPx: 12,
             innerNodeHeaderLabeller: function(ctx,rect,rgb,id) {
                 ctx.rect(rect[0],rect[1],rect[2],rect[3]);
                 ctx.clip();
@@ -425,8 +425,8 @@ TreemapUtils.squarify = function(rect,vals) {
             colorOption: 0, // index into color attribute of this.options.nodeData elements
             nodeBorderWidth: 0, // TODO: >0 doesn't work quite right yet
             labelsEnabled: false, // boolean flag indicating whether or not to call node labeller methods
-            animationEnabled: false, // boolean flag indicating whether or not to animate size option changes
-            animationDuration: 1000, // millisec duration of size transition animation
+            animationEnabled: false, // boolean flag indicating whether or not to animate option changes
+            animationDurationMs: 1000, // millisec duration of option change animation
             animationEasing: {}, // defaults to linear
             nodeData: {}
         },  
@@ -441,8 +441,9 @@ TreemapUtils.squarify = function(rect,vals) {
             // init is called each time widget is called w/o arguments 
             //console.log("_init was called");
             this._refreshCanvas();
-            this._refreshLayout();
             this._refreshColorGradient();
+            this._refreshColor();
+            this._refreshLayout();
             this._renderNodes();
             this._renderNodeLabels();
         },
@@ -452,68 +453,49 @@ TreemapUtils.squarify = function(rect,vals) {
             $.Widget.prototype._setOption.apply( this, arguments );  
             switch (option) {  
                 case "dimensions":
-                    this.options.dimensions = value;
                     this._refreshCanvas();
                     this._refreshLayout();
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "layoutMethod":
-                    this.options.layoutMethod = value;
                     this._refreshLayout();
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "labelsEnabled":
-                    this.options.labelsEnabled = value;
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "leafNodeBodyGradient":
-                    this.options.leafNodeBodyGradient = value;
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "colorStops":
-                    this.options.colorStops = value;
                     this._refreshColorGradient();
+                    this._refreshColor();
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "colorOption":
-                    this.options.colorOption = value;
-                    this._refreshColorGradient();
-                    this._renderNodes();
-                    this._renderNodeLabels();
-                    break;
-                case "colorOptionAndColorStops":
-                    this.options.colorOption = value.colorOption;
-                    this.options.colorStops = value.colorStops;
-                    this._refreshColorGradient();
+                    this._refreshColor();
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
                 case "sizeOption":
-                    this.options.sizeOption = value;
                     this._refreshLayout();
-                    this._animate();
+                    this._animateOptionChange();
                     break;
                 case "nodeData":
-                    this.options.nodeData = value;
+                    this._refreshColor();
                     this._refreshLayout();
                     this._renderNodes();
                     this._renderNodeLabels();
                     break;
-                case "animationEnabled":
-                    this.options.animationEnabled = value;
-                    break;
-                case "animationDuration":
-                    this.options.animationDuration = value;
-                    break;
             }  
         },
 
-        _animate: function() {
+        _animateOptionChange: function() {
             if ( this.options.animationEnabled == true ) {
                 (function() {
                     var requestAnimationFrame = window.requestAnimationFrame 
@@ -530,45 +512,47 @@ TreemapUtils.squarify = function(rect,vals) {
                     var timestamp = Date.now(); // FIXME: hack- webkit is returning something else
                     var progress = timestamp - start;
                     //console.log("progress = "+progress);
-                    if ( progress < that.options.animationDuration) {
-                        that._animateNodes(spline.get(progress/that.options.animationDuration));
+                    if ( progress < that.options.animationDurationMs) {
+                        that._animateNodes(spline.get(progress/that.options.animationDurationMs));
                         requestAnimationFrame(step);
                     } else {
+                        that._animationActive = false;
                         that._renderNodes();
                         that._renderNodeLabels();
-                        that._animationActive = false;
                     }
                 }
                 var that = this;
                 requestAnimationFrame(step);
             } else {
-              this._renderNodes();
-              this._renderNodeLabels();
+                this._renderNodes();
+                this._renderNodeLabels();
             }
         },
 
         _animateNodes: function(percent) {
             var processNodes = function(nodes) {
                 var sourceBodyRect,
-                    rgb,
                     i,
                     j;
 
                 for (i = 0; i < nodes.length; i++) {
                     if ( nodes[i].hasOwnProperty('children') === false) { // leaf nodes only
-                        sourceBodyRect = nodes[i].prevGeometry.body.slice();
                         if (isNaN(nodes[i].geometry.body[0]) 
                             || isNaN(nodes[i].geometry.body[1]) 
                             || isNaN(nodes[i].geometry.body[2]) 
                             || isNaN(nodes[i].geometry.body[3])) {
                             continue; // TODO: track down why NaNs are showing up here
                         }
-                        for ( j = 0; j < 4; j++ ) {
-                          sourceBodyRect[j] += (nodes[i].geometry.body[j] - nodes[i].prevGeometry.body[j]) * percent;
+                        if ( nodes[i].prevGeometry !== undefined ) {
+                            sourceBodyRect = nodes[i].prevGeometry.body.slice();
+                            for ( j = 0; j < 4; j++ ) {
+                                sourceBodyRect[j] += (nodes[i].geometry.body[j] - nodes[i].prevGeometry.body[j]) * percent;
+                            }
+                        } else {
+                            sourceBodyRect = nodes[i].geometry.body;
                         }
-                        rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
                         ctx.save();
-                        ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,sourceBodyRect,rgb);
+                        ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,sourceBodyRect,nodes[i].computedColor);
                         ctx.fillRect(sourceBodyRect[0],sourceBodyRect[1],sourceBodyRect[2],sourceBodyRect[3]);
                         ctx.restore();
                     } else {
@@ -584,11 +568,11 @@ TreemapUtils.squarify = function(rect,vals) {
         },
 
         _renderNodes: function() {
+            if ( this._animationActive !== undefined && this._animationActive === true ) return;
             var processNodes = function(nodes) {
                 var bodyRect,
                     headerRect,
                     nodeRect,
-                    rgb,
                     i,
                     j;
 
@@ -602,11 +586,9 @@ TreemapUtils.squarify = function(rect,vals) {
                             continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         }
 
-                        rgb = that._getRgbColor(nodes[i].color[that.options.colorOption]);
-                        nodes[i].computedColor = rgb;
                         ctx.save();
                         if ( nodes[i].hasOwnProperty('children') && headerRect !== null) { // group node
-                            ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,rgb);
+                            ctx.fillStyle = that.options.innerNodeHeaderGradient.call(that,ctx,headerRect,nodes[i].computedColor);
                             ctx.fillRect(headerRect[0],headerRect[1],headerRect[2],headerRect[3]);
                             if ( nodes[i].hasOwnProperty('children') && that.options.nodeBorderWidth === 0) {
                                 ctx.strokeStyle = "#000";
@@ -622,7 +604,7 @@ TreemapUtils.squarify = function(rect,vals) {
                             nodeRect[1] = headerRect[1];
                             nodeRect[3] = headerRect[3] + bodyRect[3];
                         } else { // leaf node
-                            ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,bodyRect,rgb);
+                            ctx.fillStyle = that.options.leafNodeBodyGradient.call(that,ctx,bodyRect,nodes[i].computedColor);
                             ctx.fillRect(bodyRect[0],bodyRect[1],bodyRect[2],bodyRect[3]);
                         }
                         ctx.restore();
@@ -648,14 +630,12 @@ TreemapUtils.squarify = function(rect,vals) {
         },
 
         _renderNodeLabels: function() {
-            if (this.options.labelsEnabled !== true) {
-                return;
-            }
+            if ( this._animationActive !== undefined && this._animationActive === true ) return;
+            if ( this.options.labelsEnabled !== true ) return;
 
             var processNodes = function(nodes) {
                 var bodyRect,
                     headerRect,
-                    rgb,
                     i;
 
                 for (i = 0; i < nodes.length; i++) {
@@ -667,17 +647,16 @@ TreemapUtils.squarify = function(rect,vals) {
                             continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         }
 
-                        rgb = nodes[i].computedColor;
                         ctx.save();
                         ctx.beginPath();
                         if ( nodes[i].hasOwnProperty('children')) {
                             if (headerRect !== null) {
                                 // Inner Node
-                                that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,rgb,nodes[i].id);
+                                that.options.innerNodeHeaderLabeller.call(that,ctx,headerRect,nodes[i].computedColor,nodes[i].id);
                             }
                         } else {
                             // Leaf Node
-                            that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,rgb,nodes[i].id);
+                            that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,nodes[i].computedColor,nodes[i].id);
                         }
                         ctx.restore();
                     }
@@ -774,6 +753,23 @@ TreemapUtils.squarify = function(rect,vals) {
             this.options.colorGradientMap = ctx.getImageData(0,0,this.options.colorResolution,1);
         },
 
+        _refreshColor: function() {
+            function processNodes(nodes) { 
+                var i;
+                for (i = 0; i < nodes.length; i++) {
+                    if ( nodes[i].color !== undefined ) {
+                        nodes[i].colorVal = nodes[i].color[that.options.colorOption];
+                        nodes[i].computedColor = that._getRgbColor(nodes[i].colorVal);
+                    }
+                    if (nodes[i].hasOwnProperty('children')) {
+                        processNodes(nodes[i].children);
+                    }
+                }
+            }
+            var that = this;
+            processNodes([that.options.nodeData]);
+        },
+
         _refreshLayout: function() {
             function processNodes(rect,nodes) { 
                 var a = [],
@@ -812,11 +808,11 @@ TreemapUtils.squarify = function(rect,vals) {
                         bodyRect = nodes[i].geometry.body;
                         headerRect = nodes[i].geometry.header;
                         // adjust bodyRect according to header height
-                        if (that._isRootNode(nodes[i]) === false && (bodyRect[3]-that.options.innerNodeHeaderHeight>0)) { // skips root node
+                        if (that._isRootNode(nodes[i]) === false && (bodyRect[3]-that.options.innerNodeHeaderHeightPx>0)) { // skips root node
                             headerRect = nodes[i].geometry.header = bodyRect.slice(); // init header rect with copy of body geometry
-                            headerRect[3] = that.options.innerNodeHeaderHeight;
-                            bodyRect[1] += that.options.innerNodeHeaderHeight;
-                            bodyRect[3] -= that.options.innerNodeHeaderHeight;
+                            headerRect[3] = that.options.innerNodeHeaderHeightPx;
+                            bodyRect[1] += that.options.innerNodeHeaderHeightPx;
+                            bodyRect[3] -= that.options.innerNodeHeaderHeightPx;
                         }
                         // adjust bodyRect and headerRect according to border width
                         if (that._isRootNode(nodes[i]) === false // skips root node
