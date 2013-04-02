@@ -48,7 +48,7 @@
             <div class="colorByOption" id="colorBy2">color opt 3</div>
             <div class="colorByOption" id="colorBy3">color opt 4</div>
         </div>
-        <div id="debug-info"><span><p>0,0</p></span></div>
+        <div id="debug-info" style="display:inline-block"><span><p>0,0</p></span></div>
         <script type="text/javascript">
             var mouseclickHandler = function(e,data) {
                 var nodes = data.nodes;
@@ -67,20 +67,21 @@
             var init = function(){
                 var createTreemap = function() {
                     $.getJSON("nodeData.json?t="+new Date().getTime(),function(data){
-                    $("#treemap").treemap({
-                        "dimensions":[$(document).width(),$(document).height()-$("#sizeColorByOptions").height()-$("#debug-info").height()],
-                        "sizeOption":1,
-                        "colorOption":1,
-                        "labelsEnabled":true,
-                        "animationEnabled":true,
-                        "animationDurationMs":2000,
-                        "animationEasing":TreemapUtils.Easing["ease-in-out"],
-                        "nodeData":data
-                    })
-                    .bind('treemapmousemove',mousemoveHandler)
-                    .bind('treemapclick',mouseclickHandler)
-                    .mouseleave(function(){mouseleaveHandler()});
-                    })};
+                        $("#treemap").treemap({
+                            "dimensions":[$(document).width(),$(document).height()-$("#sizeColorByOptions").height()-$("#debug-info").height()],
+                            "sizeOption":1,
+                            "colorOption":1,
+                            "labelsEnabled":true,
+                            "animationEnabled":true,
+                            "animationDurationMs":2000,
+                            "animationEasing":TreemapUtils.Easing["ease-in-out"],
+                            "nodeData":data
+                        })
+                        .bind('treemapmousemove',mousemoveHandler)
+                        .bind('treemapclick',mouseclickHandler)
+                        .mouseleave(function(){mouseleaveHandler()});
+                        })
+                };
                 $(".sizeByOption").mouseenter(function(){
                     var testSizeOption = $(this).attr("id").match(/[0-9]+/)[0];
                     if (testSizeOption == currSizeOption) return;

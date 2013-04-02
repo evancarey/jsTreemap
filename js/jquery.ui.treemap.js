@@ -435,11 +435,13 @@ TreemapUtils.squarify = function(rect,vals) {
         _create: function() {
             // create is called once per instance
             //console.log("_create was called");
+            this.stats = {}
         },
 
         _init: function() {
             // init is called each time widget is called w/o arguments 
             //console.log("_init was called");
+            this.stats = {}
             this._refreshCanvas();
             this._refreshColorGradient();
             this._refreshColor();
@@ -626,7 +628,7 @@ TreemapUtils.squarify = function(rect,vals) {
             that._clearScanLines();
             processNodes([that.options.nodeData]);
             var t1 = new Date();
-            that.stats.renderLayoutMsec = (t1-t0);
+            that.stats['renderLayoutMsec'] = (t1-t0);
         },
 
         _renderNodeLabels: function() {
@@ -644,6 +646,9 @@ TreemapUtils.squarify = function(rect,vals) {
                         headerRect = nodes[i].geometry.header;
 
                         if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] === 0 || bodyRect[3] === 0) {
+                            if ( nodes[i].hasOwnProperty('children') === false ) {
+                                that.stats['leafNodeCnt'] += 1;
+                            }
                             continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
                         }
 
@@ -657,6 +662,8 @@ TreemapUtils.squarify = function(rect,vals) {
                         } else {
                             // Leaf Node
                             that.options.leafNodeBodyLabeller.call(that,ctx,bodyRect,nodes[i].computedColor,nodes[i].id);
+                            that.stats['leafNodeCnt'] += 1;
+                            that.stats['renderedLeafNodeCnt'] += 1;
                         }
                         ctx.restore();
                     }
@@ -667,12 +674,14 @@ TreemapUtils.squarify = function(rect,vals) {
             };
             // TODO: variable size based on node size | fixed size and position
             var that = this;
+            that.stats['leafNodeCnt'] = 0;
+            that.stats['renderedLeafNodeCnt'] = 0;
             var t0 = new Date();
             var canvas = that.element.find("canvas")[0];
             var ctx = canvas.getContext("2d");
             processNodes([that.options.nodeData]);
             var t1 = new Date();
-            that.stats.renderLabelsMsec = (t1-t0);
+            that.stats['renderLabelsMsec'] = (t1-t0);
         },
 
         _refreshCanvas: function() {
@@ -839,7 +848,7 @@ TreemapUtils.squarify = function(rect,vals) {
             that._clearNodeList();
             processNodes(rect,[that.options.nodeData]);
             var t1 = new Date();
-            that.stats.computeLayoutMsec = (t1-t0);
+            that.stats['computeLayoutMsec'] = (t1-t0);
         },
 
         _getRgbColor: function(val) {
@@ -934,9 +943,8 @@ TreemapUtils.squarify = function(rect,vals) {
             // In jQuery UI 1.8, you must invoke the destroy method from the base widget
             $.Widget.prototype.destroy.call( this );
             // In jQuery UI 1.9 and above, you would define _destroy instead of destroy and not call the base method
-        },
+        }
 
-        stats: function() { return this.stats; }
     });
 
 }( jQuery ) );
