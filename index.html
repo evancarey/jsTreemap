@@ -2,9 +2,9 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css" media=screen>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css" media=screen>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui.treemap.js"></script>
         <script type="text/javascript" src="moboxAndLabelData.json"></script>
         <style type="text/css">
@@ -34,9 +34,9 @@
                 display: none;
             }
             .mouseoverbox p {
-                margin: 0px;
-                padding: 0px;
-                font-size: 0.625em;
+                margin: 0px 2px 0px 2px;
+                padding: 0px 2px 0px 2px;
+                font-size: 0.8em;
                 color: #444;
             }
             .codeDiv {
@@ -54,15 +54,15 @@
                     <p>Utilizing the jQuery widget factory and HTML5 canvas this Javascript treemap widget presents hierarchical data using the squarified treemap layout algorithm described in "<a href="http://www.win.tue.nl/~vanwijk/stm.pdf">Squarified Treemaps</a>", by Mark Bruls, Kees Huizing and Jarke J. van Wijk.</p>  
                     <p>The jQuery treemap widget code and this page's HTML, CSS and Javascript are available from <a href="https://github.com/evancarey/jsTreemap">https://github.com/evancarey/jsTreemap</a>. Stable tagged versions of the source can also be obtained via the jQuery plugin registry <a href="http://plugins.jquery.com/treemap/">http://plugins.jquery.com/treemap/</a>.  Development and testing has primarily been limited to current versions of Chrome, Safari and FF.  Please send issues, ideas and (even better) fixes to me via GitHub.</p>
                     <h4>Example</h4>
-                    <p>The following example demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create and destroy the treemap.  Click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient applied to the treemap's leaf nodes.</p>
-                    <input id="t2" type="button" value="800x200"/>
-                    <input id="t3" type="button" value="600x400"/>
+                    <p>The following example treemap of random data demonstrates the creation, destruction and dynamic update of some of the treemap plugin options.  Using the buttons below, create and destroy the treemap.  Click the other buttons to update the treemap plugin's dimensions, color gradient and the gradient applied to the treemap's leaf nodes.</p>
+                    <input id="t8" type="button" value="destroy"/>
+                    <input id="t1" type="button" value="create"/>
+                    <input id="t2" type="button" value="900x200"/>
+                    <input id="t3" type="button" value="900x600"/>
                     <input id="t4" type="button" value="color1"/>
                     <input id="t5" type="button" value="color2"/>
                     <input id="t6" type="button" value="gradient1"/>
                     <input id="t7" type="button" value="gradient2"/>
-                    <input id="t8" type="button" value="destroy"/>
-                    <input id="t1" type="button" value="create"/>
                     <input id="t9" type="checkbox" checked="checked"/>
                     <label for="t9">labels</label>
                     <div><span id="treemap"></span></div>
@@ -94,7 +94,7 @@
                         <h5>nodeData</h5>
                         <p>A data structure containing the nodes to be presented in the treemap.  Each node has the members: "id", "size", and "color".  Internal nodes have the additional member "children".  Root node does not require the members "size" or "color".  If present they are ignored.
                         <ul>
-                            <li>"id" is a unique identifier for the node.</li>
+                            <li>"id" is a unique identifier for the node.  Identifier can be used in treemap event handlers to perform lookup into node detail data.</li>
                             <li>"size" is an array of float values in the range [0,1] that can be used to size a node.  Size values are relative values that represent what fraction of the parent's area the child node should occupy.  The element used to size the node is dependent on the value of the option "sizeOption".</li>
                             <li>"color" is an array of float values in the range [0,1) that are used to compute an index into the treemap's color gradient.  The element used to color the node is dependent on the value of the option "colorOption".</li>
                             <li>"children" is an array of child nodes.</li>
@@ -107,23 +107,23 @@
         "children":[
             {
                 "id":"23f627dc", 
-                "size":[.25], 
-                "color":[.39], 
+                "size":[0.25,0.349], 
+                "color":[0.39,0.54], 
                 "children":[
                     {
                         "id":"ce96d31f", 
-                        "size":[.25], 
-                        "color":[.74]
+                        "size":[0.25,0.64], 
+                        "color":[0.74,0.10]
                     },
                     {
                         "id":"91e0ea1d", 
-                        "size":[.25], 
-                        "color":[.98]
+                        "size":[0.25,0.15], 
+                        "color":[0.98,0.78]
                     },
                     {
                         "id":"62188591", 
-                        "size":[.16667], 
-                        "color":[.39]
+                        "size":[0.16667,0.32], 
+                        "color":[0.39,0.48]
                     },
                     ...
                 ]
@@ -550,7 +550,7 @@
                 $("#t2").click(function(){
                     $(".highlighter").hide();
                     $("#treemap").unbind()
-                    .treemap("option","dimensions",[800,200])
+                    .treemap("option","dimensions",[900,200])
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler)
                     .mouseleave(function(){mouseleaveHandler()});
@@ -558,7 +558,7 @@
                 $("#t3").click(function(){
                     $(".highlighter").hide().unbind();
                     $("#treemap").unbind()
-                    .treemap("option","dimensions",[600,400])
+                    .treemap("option","dimensions",[900,600])
                     .bind('treemapmousemove',mousemoveHandler)
                     .bind('treemapclick',mouseclickHandler)
                     .mouseleave(function(){mouseleaveHandler()});
