@@ -359,10 +359,19 @@ TreemapUtils.squarify = function(rect,vals) {
     var row = [];
     var layout = [];
     var newVals = [];
-    // vals come in normalized. convert them here to make them relative to containing rect
-    newVals = vals.map(function(item){return item*(rect[2]*rect[3]);}); 
-    var subrect = new Subrectangle(rect.slice());
-    nrSquarify(newVals);
+    var i;
+
+    // if either height or width of containing rect are <= 0 simply copy containing rect to layout rects
+    if (rect[2] <= 0 || rect[3] <= 0) {
+        for (i = 0; i < vals.length; i++) {
+            layout.push(rect.slice());
+        }
+    } else { // else compute squarified layout
+        // vals come in normalized. convert them here to make them relative to containing rect
+        newVals = vals.map(function(item){return item*(rect[2]*rect[3]);}); 
+        var subrect = new Subrectangle(rect.slice());
+        nrSquarify(newVals);
+    }
     return layout;
 };
 
@@ -539,12 +548,6 @@ TreemapUtils.squarify = function(rect,vals) {
 
                 for (i = 0; i < nodes.length; i++) {
                     if ( nodes[i].hasOwnProperty('children') === false) { // leaf nodes only
-                        if (isNaN(nodes[i].geometry.body[0]) 
-                            || isNaN(nodes[i].geometry.body[1]) 
-                            || isNaN(nodes[i].geometry.body[2]) 
-                            || isNaN(nodes[i].geometry.body[3])) {
-                            continue; // TODO: track down why NaNs are showing up here
-                        }
                         if ( nodes[i].prevGeometry !== undefined ) {
                             sourceBodyRect = nodes[i].prevGeometry.body.slice();
                             for ( j = 0; j < 4; j++ ) {
@@ -584,8 +587,8 @@ TreemapUtils.squarify = function(rect,vals) {
                         headerRect = nodes[i].geometry.header;
                         nodeRect = bodyRect.slice();
 
-                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] === 0 || bodyRect[3] === 0) {
-                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                        if (bodyRect[2] <= 0 || bodyRect[3] <= 0) {
+                            continue; // blow off nodes w/o area
                         }
 
                         ctx.save();
@@ -645,11 +648,11 @@ TreemapUtils.squarify = function(rect,vals) {
                         bodyRect = nodes[i].geometry.body;
                         headerRect = nodes[i].geometry.header;
 
-                        if (isNaN(bodyRect[0]) || isNaN(bodyRect[1]) || isNaN(bodyRect[2]) || isNaN(bodyRect[3]) || bodyRect[2] === 0 || bodyRect[3] === 0) {
+                        if (bodyRect[2] <= 0 || bodyRect[3] <= 0) {
                             if ( nodes[i].hasOwnProperty('children') === false ) {
                                 that.stats['leafNodeCnt'] += 1;
                             }
-                            continue; // blow off nodes w/o area TODO: track down why NaNs are showing up here
+                            continue; // blow off nodes w/o area 
                         }
 
                         ctx.save();
