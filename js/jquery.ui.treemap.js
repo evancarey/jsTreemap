@@ -437,6 +437,7 @@ TreemapUtils.squarify = function(rect,vals) {
             animationEnabled: false, // boolean flag indicating whether or not to animate option changes
             animationDurationMs: 1000, // millisec duration of option change animation
             animationEasing: {}, // defaults to linear
+            postProcessCurve: {}, // defaults to none
             nodeData: {}
         },  
 
@@ -494,6 +495,10 @@ TreemapUtils.squarify = function(rect,vals) {
                     this._renderNodeLabels();
                     break;
                 case "sizeOption":
+                    this._refreshLayout();
+                    this._animateOptionChange();
+                    break;
+                case "postProcessCurve":
                     this._refreshLayout();
                     this._animateOptionChange();
                     break;
@@ -783,6 +788,19 @@ TreemapUtils.squarify = function(rect,vals) {
         },
 
         _refreshLayout: function() {
+            function skewVals(a) {
+                if (Object.getOwnPropertyNames(that.options.postProcessCurve).length !== 0) {
+                    var i;
+                    for (i = 0; i < a.length; i++) {
+                        a[i] = spline.get(a[i]);
+                    }
+                    var sum = TreemapUtils.sumArray(a);
+                    for (i = 0; i < a.length; i++) {
+                        a[i] = a[i]/sum;
+                    }
+                }
+                return a;
+            }
             function processNodes(rect,nodes) { 
                 var a = [],
                     bodyRect,
@@ -807,6 +825,7 @@ TreemapUtils.squarify = function(rect,vals) {
                       a[i]=nodes[i].size[that.options.sizeOption];
                     }
                 }
+                skewVals(a);
                 b = that.options.layoutMethod([rect[0],rect[1],rect[2],rect[3]],a);
                 for (i = 0; i < nodes.length; i++) {
                     if (nodes[i].geometry) {
@@ -847,6 +866,7 @@ TreemapUtils.squarify = function(rect,vals) {
 
             var that = this;
             var t0 = new Date();
+            var spline = new TreemapUtils.KeySpline(this.options.postProcessCurve);
             var rect = [0,0,that.options.dimensions[0],that.options.dimensions[1]];
             that._clearNodeList();
             processNodes(rect,[that.options.nodeData]);
