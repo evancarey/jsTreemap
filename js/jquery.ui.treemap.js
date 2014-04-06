@@ -239,6 +239,11 @@ TreemapUtils.hex2rgb = function(color) {
 // http://ejohn.org/blog/fast-javascript-maxmin/#postcomment
 //
 TreemapUtils.squarify = function(rect,vals) {
+
+    // "We assume a datatype Rectangle that contains the layout during the computation and
+    // is global to the procedure squarify. It supports a function width() that gives the length of
+    // the shortest side of the remaining subrectangle in which the current row is placed and a
+    // function layoutrow() that adds a new row of children to the rectangle." - Bruls et. al.
     var Subrectangle = function(rect) {
         this.setX = function(x) {
             rect[2] -= x - rect[0];
@@ -264,10 +269,12 @@ TreemapUtils.squarify = function(rect,vals) {
             return Math.min(rect[2],rect[3]);
         };
     };
+
     //
-    // The function worst() gives the highest aspect ratio of a list 
+    // "The function worst() gives the highest aspect ratio of a list 
     // of rectangles, given the length of the side along which they are to
     // be laid out.
+    // ...
     // Let a list of areas R be given and let s be their total sum. Then the function worst is
     // defined by:
     // worst(R,w) = max(max(w^2r=s^2; s^2=(w^2r)))
@@ -275,7 +282,7 @@ TreemapUtils.squarify = function(rect,vals) {
     // Since one term is increasing in r and the other is decreasing, this is equal to
     //              max(w^2r+=(s^2); s^2=(w^2r-))
     // where r+ and r- are the maximum and minimum of R. 
-    // Hence, the current maximum and minimum of the row that is being laid out.
+    // Hence, the current maximum and minimum of the row that is being laid out." - Bruls et. al.
     // 
     var worst = function(r,w) {
         var rMax = Math.max.apply(null,r);
