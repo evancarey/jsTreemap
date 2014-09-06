@@ -887,7 +887,7 @@ TreemapUtils.squarify = function(rect,vals) {
                 return TreemapUtils.hex2rgb(this.options.naColor);
             }
             var map = this.options.colorGradientMap.data;
-            var i = Math.floor(val*(map.length/4))*4;
+            var i = Math.floor(val*(map.length/4-1))*4;
             return [map[i],map[i+1],map[i+2]];
         },
 
