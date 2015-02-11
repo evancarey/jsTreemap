@@ -750,6 +750,27 @@ TreemapUtils.squarify = function(rect,vals) {
                     data = {"nodes": nodes, "ids": ids};
                     that._trigger('click',e,data);
                 }
+            }).dblclick(function(e){
+                if ( that._animationActive !== undefined && that._animationActive === true ) return;
+                var offset = that.element.offset(),
+                    offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
+                    offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
+                    width = that.options.dimensions[0],
+                    height = that.options.dimensions[1],
+                    ids,
+                    nodes,
+                    data,
+                    i;
+
+                if (e.pageX < offsetX+width && e.pageY < (offsetY+height)) {
+                    ids = that._coordsToId(e.pageX-offsetX,e.pageY-offsetY);
+                    nodes = [];
+                    for (i = 0; i < ids.length; i++ ) {
+                        nodes.push(that._getNode([ids[i]]));
+                    }
+                    data = {"nodes": nodes, "ids": ids};
+                    that._trigger('dblclick',e,data);
+                }
             });
         },
 
