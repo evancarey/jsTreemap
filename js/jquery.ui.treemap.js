@@ -730,7 +730,16 @@ TreemapUtils.squarify = function(rect,vals) {
                     that._trigger('mousemove',e,data);
                 }
             }).click(function(e){
-                if ( that._animationActive !== undefined && that._animationActive === true ) return;
+               that._clickEventHandler(e);
+            }).dblclick(function(e){
+               that._clickEventHandler(e);
+                
+            });
+        },
+        
+        _clickEventHandler: function(e){
+             var that = this;
+             if ( that._animationActive !== undefined && that._animationActive === true ) return;
                 var offset = that.element.offset(),
                     offsetX = parseInt(offset.left, 10), // offsets are float values on mac/FF
                     offsetY = parseInt(offset.top, 10), // convert them to ints so coordsToId will work
@@ -748,11 +757,9 @@ TreemapUtils.squarify = function(rect,vals) {
                         nodes.push(that._getNode([ids[i]]));
                     }
                     data = {"nodes": nodes, "ids": ids};
-                    that._trigger('click',e,data);
+                    that._trigger(e.type,e,data);
                 }
-            });
         },
-
         _refreshColorGradient: function() {
             var canvas = document.createElement("canvas"),
                 colorStops = this.options.colorStops,
@@ -887,7 +894,7 @@ TreemapUtils.squarify = function(rect,vals) {
                 return TreemapUtils.hex2rgb(this.options.naColor);
             }
             var map = this.options.colorGradientMap.data;
-            var i = Math.floor(val*(map.length/4-1))*4;
+            var i = Math.floor(val*(map.length/4))*4;
             return [map[i],map[i+1],map[i+2]];
         },
 
